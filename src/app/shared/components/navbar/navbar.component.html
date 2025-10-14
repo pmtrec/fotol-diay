@@ -1,0 +1,40 @@
+<app-bande-publicite></app-bande-publicite>
+
+<nav class="navbar flex items-center justify-between p-4 bg-white shadow-md">
+  <!-- 🟠 Logo -->
+  <div class="navbar-left flex items-center">
+    <h1 class="logo text-2xl font-bold text-blue-600 flex items-center">
+      <span class="logo-text">Fotol Diay</span>
+      <span class="logo-star text-yellow-500 ml-1">★</span>
+    </h1>
+  </div>
+
+  <!-- 🔍 Barre de recherche -->
+  <div class="navbar-center flex-1 mx-4">
+    <div class="search-box relative flex items-center">
+      <i class="fa-solid fa-magnifying-glass absolute left-3 text-gray-400"></i>
+      <input type="text" placeholder="Cherchez un produit, une marque ou une catégorie"
+             class="w-full pl-10 pr-24 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <button class="absolute right-2 bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700">
+        Rechercher
+      </button>
+    </div>
+  </div>
+
+  <!-- 🧑‍💼 Liens utilisateur -->
+  <div class="navbar-right flex items-center gap-6">
+    <div class="nav-link flex items-center gap-1 cursor-pointer hover:text-blue-600" (click)="goToLogin()">
+      <i class="fa-regular fa-user"></i> Se connecter
+    </div>
+    <div class="nav-link flex items-center gap-1 cursor-pointer hover:text-blue-600">
+      <i class="fa-regular fa-circle-question"></i> Aide
+    </div>
+    <a routerLink="/cart" class="nav-link relative flex items-center gap-1 cursor-pointer hover:text-blue-600">
+      <i class="fa-solid fa-cart-shopping"></i> Panier
+      <!-- Badge -->
+      <span *ngIf="cartItemCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+        {{ cartItemCount > 99 ? '99+' : cartItemCount }}
+      </span>
+    </a>
+  </div>
+</nav>
