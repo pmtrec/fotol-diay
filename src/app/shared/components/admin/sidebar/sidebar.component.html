@@ -1,0 +1,75 @@
+<aside class="admin-sidebar">
+  <!-- En-tête de la sidebar -->
+  <div class="sidebar-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="fa-solid fa-crown"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation principale -->
+  <nav class="sidebar-nav">
+    <ul class="nav-menu">
+      <li class="nav-item" *ngFor="let item of menuItems">
+        <a
+          [routerLink]="item.route"
+          class="nav-link"
+          [class.active]="isActive(item.route)"
+          [class.has-badge]="hasBadge(item)">
+
+          <div class="nav-icon">
+            <i [class]="item.icon"></i>
+          </div>
+
+          <span class="nav-label">{{ item.label }}</span>
+
+          <div class="nav-badge" *ngIf="hasBadge(item)" [ngClass]="getBadgeClass(item)">
+            {{ item.badge }}
+          </div>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Section d'informations système -->
+  <div class="sidebar-info">
+    <div class="system-status">
+      <div class="status-item">
+        <div class="status-indicator online"></div>
+        <span>Système OK</span>
+      </div>
+      <div class="status-item">
+        <div class="status-indicator online"></div>
+        <span>Base de données</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pied de page avec infos admin -->
+  <div class="sidebar-footer">
+    <div class="admin-profile">
+      <div class="profile-avatar">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <div class="profile-info">
+        <h4>Administrateur</h4>
+        <p>Connecté</p>
+      </div>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="action-btn settings" routerLink="/admin/settings">
+        <i class="fa-solid fa-cog"></i>
+        <span>Paramètres</span>
+      </button>
+
+      <button class="action-btn logout">
+        <i class="fa-solid fa-sign-out-alt"></i>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</aside>

@@ -1,17 +1,35 @@
 <div class="login">
   <h2>Login</h2>
+
+  <!-- Error message display -->
+  <div *ngIf="errorMessage" class="error-message" style="color: red; margin-bottom: 15px; padding: 10px; background-color: #ffe6e6; border-radius: 4px;">
+    {{ errorMessage }}
+  </div>
+
   <form (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="username">Username:</label>
-      <input type="text" id="username" [(ngModel)]="username" name="username" required>
+      <input type="text" id="username" [(ngModel)]="username" name="username" required [disabled]="isLoading">
     </div>
     <div class="form-group">
       <label for="password">Password:</label>
-      <input type="password" id="password" [(ngModel)]="password" name="password" required>
+      <input type="password" id="password" [(ngModel)]="password" name="password" required [disabled]="isLoading">
     </div>
-    <button type="submit">Login</button>
+    <button type="submit" [disabled]="isLoading">
+      <span *ngIf="isLoading">Logging in...</span>
+      <span *ngIf="!isLoading">Login</span>
+    </button>
   </form>
+
   <div class="auth-links">
-    <button type="button" class="create-account-btn" (click)="goToRegister()">Create Account</button>
+    <button type="button" class="create-account-btn" (click)="goToRegister()" [disabled]="isLoading">Create Account</button>
+  </div>
+
+  <!-- Display available credentials for testing -->
+  <div class="test-credentials" style="margin-top: 20px; padding: 15px; background-color: #f0f0f0; border-radius: 4px; font-size: 12px;">
+    <strong>Test Credentials:</strong><br>
+    Admin: admin / admin123<br>
+    Seller: vendeur1 / vendeur123<br>
+    Customer: client1 / client123
   </div>
 </div>

@@ -1,0 +1,146 @@
+<!-- 🎨 Navbar vendeur moderne avec design amélioré -->
+<app-bande-publicite></app-bande-publicite>
+
+<nav class="navbar">
+  <!-- Logo et informations vendeur -->
+  <div class="navbar-left" (click)="goToHome()">
+    <div class="logo-container">
+      <h1 class="logo">
+        <span class="logo-text">Fotol Diay</span>
+        <span class="logo-star">★</span>
+      </h1>
+      <div class="logo-subtitle">Espace Vendeur</div>
+    </div>
+    <div class="vendeur-status">
+      <span *ngIf="userVerified" class="badge-verified">
+        <i class="fa-solid fa-check-circle"></i>
+        Vendeur Vérifié
+      </span>
+      <span class="vendeur-level">Pro</span>
+    </div>
+  </div>
+
+  <!-- Barre de recherche moderne -->
+  <div class="navbar-center">
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input
+          type="text"
+          placeholder="Rechercher produits, commandes, statistiques..."
+          class="search-input"
+          (keyup.enter)="onSearch()"
+        />
+        <button class="search-btn" (click)="onSearch()">
+          <i class="fa-solid fa-search"></i>
+          Rechercher
+        </button>
+      </div>
+      <div class="search-suggestions" *ngIf="showSearchSuggestions">
+        <div class="suggestion-item" *ngFor="let suggestion of searchSuggestions">
+          <i class="fa-solid fa-history"></i>
+          {{ suggestion }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions et menu utilisateur -->
+  <div class="navbar-right">
+    <!-- Notifications avec animation -->
+    <div class="nav-item notification-container" (click)="goToNotifications()">
+      <div class="notification-btn" [class.has-notifications]="notificationCount > 0">
+        <i class="fa-regular fa-bell"></i>
+        <span *ngIf="notificationCount > 0" class="notification-badge">
+          {{ notificationCount > 99 ? '99+' : notificationCount }}
+        </span>
+      </div>
+      <div class="notification-tooltip" *ngIf="notificationCount > 0">
+        {{ notificationCount }} nouvelle(s) notification(s)
+      </div>
+    </div>
+
+    <!-- Ajouter produit avec style moderne -->
+    <div class="nav-item action-btn add-product-btn" (click)="goToAddProduct()">
+      <i class="fa-solid fa-plus-circle"></i>
+      <span class="btn-text">Nouveau produit</span>
+      <div class="btn-glow"></div>
+    </div>
+
+    <!-- Boost produit -->
+    <div class="nav-item action-btn boost-btn" (click)="goToBoost()">
+      <i class="fa-solid fa-bolt"></i>
+      <span class="btn-text">Booster</span>
+      <span class="boost-count">3</span>
+    </div>
+
+    <!-- Menu profil avec dropdown amélioré -->
+    <div class="nav-item profile-container">
+      <div class="profile-btn" (click)="toggleProfileDropdown()">
+        <div class="profile-avatar">
+          <i class="fa-regular fa-user"></i>
+        </div>
+        <div class="profile-info">
+          <span class="profile-name">{{ userName }}</span>
+          <span class="profile-role">Vendeur</span>
+        </div>
+        <i class="fa-solid fa-chevron-down dropdown-arrow" [class.rotated]="showProfileDropdown"></i>
+      </div>
+
+      <!-- Dropdown menu moderne -->
+      <div class="profile-dropdown" [class.show]="showProfileDropdown">
+        <div class="dropdown-header">
+          <div class="user-avatar">
+            <i class="fa-regular fa-user"></i>
+          </div>
+          <div class="user-info">
+            <h4>{{ userName }}</h4>
+            <p>vendeur@fotoldiay.com</p>
+          </div>
+        </div>
+
+        <div class="dropdown-menu">
+          <a class="dropdown-item" (click)="goToProfile()">
+            <i class="fa-regular fa-user"></i>
+            Mon profil
+          </a>
+          <a class="dropdown-item" (click)="goToSubscription()">
+            <i class="fa-solid fa-crown"></i>
+            Abonnement Premium
+          </a>
+          <a class="dropdown-item" (click)="goToSettings()">
+            <i class="fa-solid fa-gear"></i>
+            Paramètres
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item text-danger" (click)="logout()">
+            <i class="fa-solid fa-sign-out-alt"></i>
+            Déconnexion
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- WhatsApp avec effet pulse -->
+    <div class="nav-item whatsapp-btn" (click)="goToWhatsApp()">
+      <div class="whatsapp-icon">
+        <i class="fa-brands fa-whatsapp"></i>
+        <div class="pulse-effect"></div>
+      </div>
+      <div class="whatsapp-tooltip">Support WhatsApp</div>
+    </div>
+    <div class="nav-item whatsapp-btn" (click)="goToWhatsApp()">
+      <div class="whatsapvp-icon">
+     
+        <div class="pulse-effecvt"></div>
+      </div>
+      <div class="whatsapp-tooltip"> </div>
+    </div>
+    
+
+    <!-- Menu mobile toggle -->
+    <div class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+      <i class="fa-solid fa-bars"></i>
+    </div>
+  </div>
+</nav>

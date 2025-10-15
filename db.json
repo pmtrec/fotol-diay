@@ -1,0 +1,381 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "admin",
+      "email": "admin@klick.com",
+      "role": "ADMIN",
+      "firstName": "Admin",
+      "lastName": "Klick",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "permissions": [
+        "all"
+      ]
+    },
+    {
+      "id": "2",
+      "username": "vendeur1",
+      "email": "vendeur1@klick.com",
+      "role": "SELLER",
+      "firstName": "Marie",
+      "lastName": "Dubois",
+      "isActive": true,
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z",
+      "businessName": "Boutique Marie",
+      "businessDescription": "Mode et accessoires féminins"
+    },
+    {
+      "id": "3",
+      "username": "vendeur2",
+      "email": "vendeur2@klick.com",
+      "role": "SELLER",
+      "firstName": "Jean",
+      "lastName": "Martin",
+      "isActive": true,
+      "createdAt": "2024-02-01T00:00:00.000Z",
+      "updatedAt": "2024-02-01T00:00:00.000Z",
+      "businessName": "TechStore Jean",
+      "businessDescription": "Électronique et gadgets"
+    },
+    {
+      "id": "4",
+      "username": "client1",
+      "email": "client1@klick.com",
+      "role": "CUSTOMER",
+      "firstName": "Sophie",
+      "lastName": "Bernard",
+      "isActive": true,
+      "createdAt": "2024-03-01T00:00:00.000Z",
+      "updatedAt": "2024-03-01T00:00:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Électronique",
+      "description": "Téléphones, ordinateurs, tablettes et accessoires",
+      "image": "assets/images/categories/electronics.jpg",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "productCount": 15
+    },
+    {
+      "id": "2",
+      "name": "Mode",
+      "description": "Vêtements, chaussures et accessoires de mode",
+      "image": "assets/images/categories/fashion.jpg",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "productCount": 25
+    },
+    {
+      "id": "3",
+      "name": "Maison & Jardin",
+      "description": "Décoration, meubles et articles de jardin",
+      "image": "assets/images/categories/home.jpg",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "productCount": 18
+    },
+    {
+      "id": "4",
+      "name": "Sports & Loisirs",
+      "description": "Équipements sportifs et articles de loisir",
+      "image": "assets/images/categories/sports.jpg",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "productCount": 12
+    },
+    {
+      "id": "5",
+      "name": "Livres",
+      "description": "Livres, ebooks et magazines",
+      "image": "assets/images/categories/books.jpg",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "productCount": 8
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "name": "iPhone 15 Pro Max",
+      "description": "Le smartphone Apple dernière génération avec appareil photo professionnel, puce A17 Pro et écran Super Retina XDR.",
+      "price": 899000,
+      "images": [
+        "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400",
+        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400"
+      ],
+      "category": "Électronique",
+      "stock": 5,
+      "rating": 4.8,
+      "status": "APPROVED",
+      "sellerId": 3,
+      "createdAt": "2024-10-01T00:00:00.000Z",
+      "updatedAt": "2024-10-01T00:00:00.000Z",
+      "validatedBy": 1,
+      "validatedAt": "2024-10-02T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "Robe d'été fleurie",
+      "description": "Magnifique robe d'été légère avec motifs floraux, parfaite pour les journées ensoleillées.",
+      "price": 35000,
+      "images": [
+        "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400",
+        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400"
+      ],
+      "category": "Mode",
+      "stock": 12,
+      "rating": 4.5,
+      "status": "APPROVED",
+      "sellerId": 2,
+      "createdAt": "2024-10-05T00:00:00.000Z",
+      "updatedAt": "2024-10-05T00:00:00.000Z",
+      "validatedBy": 1,
+      "validatedAt": "2024-10-06T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "name": "Lampe de bureau LED",
+      "description": "Lampe de bureau moderne avec éclairage LED réglable, parfaite pour le travail et les études.",
+      "price": 25000,
+      "images": [
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+      ],
+      "category": "Maison & Jardin",
+      "stock": 8,
+      "rating": 4.2,
+      "status": "PENDING",
+      "sellerId": 3,
+      "createdAt": "2024-10-10T00:00:00.000Z",
+      "updatedAt": "2024-10-10T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "name": "Haltères réglables 10kg",
+      "description": "Set d'haltères réglables de 10kg avec poignées antidérapantes, idéales pour l'entraînement à domicile.",
+      "price": 45000,
+      "images": [
+        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400",
+        "https://images.unsplash.com/photo-1581009137042-c552e485697a?w=400"
+      ],
+      "category": "Sports & Loisirs",
+      "stock": 15,
+      "rating": 4.6,
+      "status": "PENDING",
+      "sellerId": 2,
+      "createdAt": "2024-10-12T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "name": "Livre \"Le Petit Prince\"",
+      "description": "L'édition classique du célèbre roman d'Antoine de Saint-Exupéry, un incontournable de la littérature française.",
+      "price": 8500,
+      "images": [
+        "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400"
+      ],
+      "category": "Livres",
+      "stock": 20,
+      "rating": 4.9,
+      "status": "APPROVED",
+      "sellerId": 2,
+      "createdAt": "2024-09-28T00:00:00.000Z",
+      "updatedAt": "2024-09-28T00:00:00.000Z",
+      "validatedBy": 1,
+      "validatedAt": "2024-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "name": "Casque Bluetooth Sony",
+      "description": "Casque sans fil Sony WH-1000XM4 avec réduction de bruit active et qualité audio exceptionnelle.",
+      "price": 285000,
+      "images": [
+        "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400",
+        "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=400"
+      ],
+      "category": "Électronique",
+      "stock": 3,
+      "rating": 4.7,
+      "status": "APPROVED",
+      "sellerId": 3,
+      "createdAt": "2024-09-25T00:00:00.000Z",
+      "updatedAt": "2024-09-25T00:00:00.000Z",
+      "validatedBy": 1,
+      "validatedAt": "2024-09-26T00:00:00.000Z"
+    },
+    {
+      "id": "7",
+      "name": "Sac à main en cuir",
+      "description": "Élégant sac à main en cuir véritable avec compartiments multiples, parfait pour le quotidien.",
+      "price": 75000,
+      "images": [
+        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400"
+      ],
+      "category": "Mode",
+      "stock": 7,
+      "rating": 4.3,
+      "status": "REJECTED",
+      "sellerId": 2,
+      "createdAt": "2024-10-08T00:00:00.000Z",
+      "updatedAt": "2024-10-08T00:00:00.000Z",
+      "validatedBy": 1,
+      "validatedAt": "2024-10-09T00:00:00.000Z",
+      "rejectionReason": "Photos de qualité insuffisante, veuillez fournir des images plus nettes du produit."
+    },
+    {
+      "id": "8",
+      "name": "Plante grasse Aloe Vera",
+      "description": "Belle plante d'intérieur facile d'entretien, purificatrice d'air et aux propriétés médicinales.",
+      "price": 15000,
+      "images": [
+        "https://images.unsplash.com/photo-1509423350716-97f9ff650b86?w=400"
+      ],
+      "category": "Maison & Jardin",
+      "stock": 25,
+      "rating": 4.4,
+      "status": "PENDING",
+      "sellerId": 3,
+      "createdAt": "2024-10-14T00:00:00.000Z",
+      "updatedAt": "2024-10-14T00:00:00.000Z"
+    },
+    {
+      "id": "86bb",
+      "name": "Papa Malick TEUW",
+      "description": "ddddddddddddd",
+      "price": 0.01,
+      "category": "Électronique",
+      "stock": 1,
+      "images": [
+        "https://picsum.photos/400/400?random=1760531038396&id=ll6ydhknpx",
+        "https://picsum.photos/400/400?random=1760531040933&id=34dqtjosghh",
+        "https://picsum.photos/400/400?random=1760531041830&id=0kfyzfq0t9b"
+      ],
+      "status": "pending",
+      "sellerId": 2,
+      "createdAt": "2025-10-15T12:24:29.752Z",
+      "updatedAt": "2025-10-15T12:24:29.752Z"
+    }
+  ],
+  "uploads": [
+    {
+      "id": 1760526671152,
+      "filename": "img_1760526671152_gmznem.jpg",
+      "originalName": "camera_capture_1760526671150.jpg",
+      "url": "https://picsum.photos/400/400?random=1760526671152&id=4lf5mqdpyxf",
+      "size": 197894,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T11:11:11.152Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760526677724,
+      "filename": "img_1760526677724_4s4qqc.jpg",
+      "originalName": "camera_capture_1760526677723.jpg",
+      "url": "https://picsum.photos/400/400?random=1760526677724&id=s8v4i4dovw",
+      "size": 194934,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T11:11:17.724Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760526686566,
+      "filename": "img_1760526686566_oo07i5.jpg",
+      "originalName": "camera_capture_1760526686561.jpg",
+      "url": "https://picsum.photos/400/400?random=1760526686566&id=wwyo3esdxu",
+      "size": 196869,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T11:11:26.566Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760526961486,
+      "filename": "img_1760526961486_zmnf1z.jpg",
+      "originalName": "camera_capture_1760526961483.jpg",
+      "url": "https://picsum.photos/400/400?random=1760526961486&id=7o6120bipr6",
+      "size": 186524,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T11:16:01.486Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760526964972,
+      "filename": "img_1760526964972_iazhqc.jpg",
+      "originalName": "camera_capture_1760526964966.jpg",
+      "url": "https://picsum.photos/400/400?random=1760526964972&id=4wulw0fbnsi",
+      "size": 185699,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T11:16:04.972Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760527423237,
+      "filename": "img_1760527423237_er918c.jpg",
+      "originalName": "camera_capture_1760527423233.jpg",
+      "url": "https://picsum.photos/400/400?random=1760527423237&id=d9h88fqb9jr",
+      "size": 169400,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T11:23:43.237Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760527427563,
+      "filename": "img_1760527427563_gy9yhz.jpg",
+      "originalName": "camera_capture_1760527427562.jpg",
+      "url": "https://picsum.photos/400/400?random=1760527427563&id=53ahc3za0k7",
+      "size": 151523,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T11:23:47.563Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760527569791,
+      "filename": "img_1760527569791_7rmw6h.jpg",
+      "originalName": "camera_capture_1760527569787.jpg",
+      "url": "https://picsum.photos/400/400?random=1760527569791&id=xu2ko1wgk7",
+      "size": 192794,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T11:26:09.791Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760531038396,
+      "filename": "img_1760531038396_6ygb8t.jpg",
+      "originalName": "camera_capture_1760531038383.jpg",
+      "url": "https://picsum.photos/400/400?random=1760531038396&id=ll6ydhknpx",
+      "size": 176049,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T12:23:58.396Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760531040933,
+      "filename": "img_1760531040933_kr8y0k.jpg",
+      "originalName": "camera_capture_1760531040928.jpg",
+      "url": "https://picsum.photos/400/400?random=1760531040933&id=34dqtjosghh",
+      "size": 177605,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T12:24:00.933Z",
+      "uploadedBy": 2
+    },
+    {
+      "id": 1760531041830,
+      "filename": "img_1760531041830_caym1f.jpg",
+      "originalName": "camera_capture_1760531041827.jpg",
+      "url": "https://picsum.photos/400/400?random=1760531041830&id=0kfyzfq0t9b",
+      "size": 176405,
+      "mimeType": "image/jpeg",
+      "uploadedAt": "2025-10-15T12:24:01.830Z",
+      "uploadedBy": 2
+    }
+  ]
+}

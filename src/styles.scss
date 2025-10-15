@@ -1,1 +1,365 @@
 /* You can add global styles to this file, and also import other style files */
+
+// ====================== UNIFIED COLOR PALETTE ======================
+
+// Primary Brand Colors
+$primary-orange: #ff9900;
+$primary-orange-light: #ffaa1a;
+$primary-orange-dark: #e68500;
+$secondary-blue: #007bff;
+$secondary-blue-light: #3395ff;
+$secondary-blue-dark: #0066cc;
+
+// Neutral Colors
+$white: #ffffff;
+$black: #000000;
+$gray-50: #fafafa;
+$gray-100: #f8f9fa;
+$gray-200: #dee2e6;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+
+// Text Colors
+$text-primary: #333333;
+$text-secondary: #6c757d;
+$text-muted: #6c757d;
+$text-dark: #333333;
+$text-light: #ffffff;
+
+// Background Colors
+$bg-primary: #ffffff;
+$bg-secondary: #f8f9fa;
+$bg-tertiary: #fafafa;
+$bg-dark: #111827;
+$bg-dark-secondary: #1f2937;
+
+// Status Colors
+$success: #28a745;
+$success-light: #d4edda;
+$success-dark: #155724;
+
+$warning: #ffc107;
+$warning-light: #fff3cd;
+$warning-dark: #856404;
+
+$danger: #dc3545;
+$danger-light: #f8d7da;
+$danger-dark: #721c24;
+
+$error: #dc3545;
+$error-light: #f8d7da;
+$error-dark: #721c24;
+
+// Border Colors
+$border-light: #dee2e6;
+$border-medium: #dee2e6;
+$border-dark: #adb5bd;
+
+// Shadow Colors
+$shadow-light: rgba(0, 0, 0, 0.1);
+$shadow-medium: rgba(0, 0, 0, 0.15);
+$shadow-dark: rgba(0, 0, 0, 0.25);
+
+// Gradient Colors
+$gradient-orange: linear-gradient(135deg, #ff9900, #ff7700);
+$gradient-orange-dark: linear-gradient(135deg, #ff7700, #ff5500);
+$gradient-blue: linear-gradient(135deg, #007bff, #0066cc);
+$gradient-success: linear-gradient(135deg, #28a745, #1e7e34);
+$gradient-dark: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+
+// ====================== GLOBAL UTILITIES ======================
+
+// Global text color utilities
+.text-primary { color: $text-primary !important; }
+.text-secondary { color: $text-secondary !important; }
+.text-muted { color: $text-muted !important; }
+.text-white { color: $white !important; }
+.text-success { color: $success !important; }
+.text-warning { color: $warning !important; }
+.text-danger { color: $danger !important; }
+
+// Global background color utilities
+.bg-primary { background-color: $bg-primary !important; }
+.bg-secondary { background-color: $bg-secondary !important; }
+.bg-tertiary { background-color: $bg-tertiary !important; }
+.bg-dark { background-color: $bg-dark !important; }
+.bg-success { background-color: $success !important; }
+.bg-warning { background-color: $warning !important; }
+.bg-danger { background-color: $danger !important; }
+
+// Global border color utilities
+.border-primary { border-color: $primary-orange !important; }
+.border-secondary { border-color: $secondary-blue !important; }
+.border-light { border-color: $border-light !important; }
+.border-medium { border-color: $border-medium !important; }
+
+// ====================== BUTTON STYLES ======================
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.btn-primary {
+    background: $gradient-orange;
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: $gradient-orange-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+    }
+
+    &:disabled {
+      background: $gray-600;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  &.btn-secondary {
+    background: $secondary-blue;
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: $secondary-blue-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    &:disabled {
+      background: $gray-600;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  &.btn-success {
+    background: $success;
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: #1e7e34;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+  }
+
+  &.btn-warning {
+    background: $warning;
+    color: $text-dark;
+
+    &:hover:not(:disabled) {
+      background: #d4ac0d;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+  }
+
+  &.btn-danger {
+    background: $danger;
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+  }
+
+  &.btn-outline-primary {
+    background: transparent;
+    color: $primary-orange;
+    border: 2px solid $primary-orange;
+
+    &:hover:not(:disabled) {
+      background: $primary-orange;
+      color: $white;
+      transform: translateY(-2px);
+    }
+  }
+
+  &.btn-outline-secondary {
+    background: transparent;
+    color: $secondary-blue;
+    border: 2px solid $secondary-blue;
+
+    &:hover:not(:disabled) {
+      background: $secondary-blue;
+      color: $white;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// ====================== FORM STYLES ======================
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $text-primary;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid $border-light;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-orange;
+      box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+    }
+
+    &.invalid {
+      border-color: $danger;
+    }
+  }
+
+  .error-message {
+    color: $danger;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+}
+
+// ====================== CARD STYLES ======================
+
+.card {
+  background: $white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px $shadow-light;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 20px $shadow-medium;
+    transform: translateY(-2px);
+  }
+
+  .card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-light;
+
+    h1, h2, h3, h4, h5, h6 {
+      margin: 0;
+      color: $text-primary;
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid $border-light;
+    background: $gray-50;
+  }
+}
+
+// ====================== UTILITY CLASSES ======================
+
+// Shadows
+.shadow-sm { box-shadow: 0 0.125rem 0.25rem $shadow-light !important; }
+.shadow { box-shadow: 0 0.5rem 1rem $shadow-light !important; }
+.shadow-lg { box-shadow: 0 1rem 3rem $shadow-medium !important; }
+
+// Border radius
+.rounded-sm { border-radius: 0.25rem !important; }
+.rounded { border-radius: 0.375rem !important; }
+.rounded-lg { border-radius: 0.5rem !important; }
+.rounded-xl { border-radius: 0.75rem !important; }
+
+// Text alignment
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+
+// Display utilities
+.d-flex { display: flex !important; }
+.d-block { display: block !important; }
+.d-inline-block { display: inline-block !important; }
+
+// Flex utilities
+.justify-center { justify-content: center !important; }
+.justify-between { justify-content: space-between !important; }
+.align-center { align-items: center !important; }
+.flex-column { flex-direction: column !important; }
+.flex-row { flex-direction: row !important; }
+
+// Spacing utilities
+.m-0 { margin: 0 !important; }
+.m-1 { margin: 0.25rem !important; }
+.m-2 { margin: 0.5rem !important; }
+.m-3 { margin: 1rem !important; }
+.m-4 { margin: 1.5rem !important; }
+.m-5 { margin: 3rem !important; }
+
+.p-0 { padding: 0 !important; }
+.p-1 { padding: 0.25rem !important; }
+.p-2 { padding: 0.5rem !important; }
+.p-3 { padding: 1rem !important; }
+.p-4 { padding: 1.5rem !important; }
+.p-5 { padding: 3rem !important; }
+
+// ====================== GLOBAL ANIMATIONS ======================
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+// ====================== RESPONSIVE UTILITIES ======================
+
+@media (max-width: 768px) {
+  .btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .card {
+    .card-header, .card-body, .card-footer {
+      padding: 1rem;
+    }
+  }
+}
