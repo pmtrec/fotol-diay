@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
-import { FooterComponent } from '../../shared/components/footer/footer.component';
-import { ProduitsComponent } from '../../shared/components/produits/produit.component';
+import { NavbarComponent } from '../../shared/components/client/navbar/navbar.component';
+import { SidebarComponent } from '../../shared/components/client/sidebar/sidebar.component';
+import { FooterComponent } from '../../shared/components/client/footer/footer.component';
+import { ProduitsComponent } from '../../shared/components/client/produits/produit.component';
 
 @Component({
   selector: 'app-main-layout',

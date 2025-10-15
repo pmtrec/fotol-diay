@@ -1,0 +1,29 @@
+<div class="produits-container">
+  <h2 class="section-title">Produits populaires</h2>
+
+  <div class="produits-grid">
+    <div class="produit-card" *ngFor="let p of produits">
+      <div class="image-container">
+        <img [src]="p.imageUrl" [alt]="p.nom" />
+        <div *ngIf="p.verified" class="badge-verified">✔ certifié</div>
+      </div>
+
+      <div class="produit-info">
+        <h3 class="produit-nom">{{ p.nom }}</h3>
+        <p class="produit-prix">{{ p.prix }}</p>
+        <p class="produit-quantite">Quantité min: {{ p.quantiteMin }}</p>
+
+        <div class="produit-fournisseur">
+          <img
+            *ngIf="p.pays"
+            [src]="'https://flagcdn.com/24x18/' + p.pays.toLowerCase() + '.png'"
+            [alt]="p.pays"
+          />
+          <span>{{ p.fournisseur }}</span>
+        </div>
+
+        <button class="btn-contact">Contacter le fournisseur</button>
+      </div>
+    </div>
+  </div>
+</div>

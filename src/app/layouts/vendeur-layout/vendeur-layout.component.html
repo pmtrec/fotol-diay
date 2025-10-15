@@ -1,0 +1,39 @@
+
+<!-- 🎨 Layout vendeur moderne avec sidebar et navbar -->
+<div class="vendeur-layout">
+  <!-- Navbar fixe en haut -->
+  <div class="navbar-container">
+    <app-navbar></app-navbar>
+  </div>
+
+  <!-- Conteneur principal -->
+  <div class="vendeur-container">
+    <!-- Sidebar latérale -->
+    <aside class="vendeur-sidebar" [class.sidebar-collapsed]="sidebarCollapsed">
+      <app-sidebar></app-sidebar>
+    </aside>
+
+    <!-- Zone de contenu principale -->
+    <main class="vendeur-content">
+      <div class="content-wrapper">
+        <!-- Contenu des produits ou page actuelle -->
+        <app-produits *ngIf="showProduits"></app-produits>
+        <!-- Router outlet pour les autres pages -->
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer en bas -->
+  <footer class="vendeur-footer">
+    <app-footer></app-footer>
+  </footer>
+
+  <!-- Overlay pour mobile -->
+  <div
+    class="sidebar-overlay"
+    [class.active]="!sidebarCollapsed"
+    (click)="toggleSidebar()"
+    *ngIf="isMobile">
+  </div>
+</div>

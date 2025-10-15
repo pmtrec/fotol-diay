@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { RoleGuard } from './core/guards/role.guard';
+import { UserRole } from './core/models/user.model';
 
 export const routes: Routes = [
   {
@@ -14,16 +16,110 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
       {
-        path: 'admin',
-        loadComponent: () => import('./modules/admin/admin.component').then(m => m.AdminComponent)
-      },
-      {
         path: 'profile',
         loadComponent: () => import('./modules/profile/profile.component').then(m => m.ProfileComponent)
       },
       {
         path: 'cart',
         loadComponent: () => import('./pages/cart/cart.component').then(m => m.CartComponent)
+      }
+    ]
+  },
+  {
+    path: 'vendeur',
+    loadComponent: () => import('./layouts/vendeur-layout/vendeur-layout.component').then(m => m.VendeurLayoutComponent),
+    canActivate: [RoleGuard],
+    data: { roles: [UserRole.SELLER] },
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/vendeur/vendeur-dashboard/vendeur-dashboard.component').then(m => m.VendeurDashboardComponent)
+      },
+      {
+        path: 'products',
+        loadComponent: () => import('./shared/components/vendeur/produits/produit.component').then(m => m.ProduitsComponent)
+      },
+      // {
+      //   path: 'products',
+      //   loadComponent: () => import('./pages/vendeur/product-list/product-list.component').then(m => m.ProductListComponent)
+      // },
+      {
+        path: 'products/add',
+        loadComponent: () => import('./pages/vendeur/add-product/add-product.component').then(m => m.AddProductComponent)
+      },
+      // {
+      //   path: 'products/edit/:id',
+      //   loadComponent: () => import('./pages/vendeur/edit-product/edit-product.component').then(m => m.EditProductComponent)
+      // },
+      // {
+      //   path: 'orders',
+      //   loadComponent: () => import('./pages/vendeur/orders/orders.component').then(m => m.OrdersComponent)
+      // },
+      // {
+      //   path: 'profile',
+      //   loadComponent: () => import('./pages/vendeur/profile/profile.component').then(m => m.ProfileComponent)
+      // },
+      // {
+      //   path: 'analytics',
+      //   loadComponent: () => import('./pages/vendeur/analytics/analytics.component').then(m => m.AnalyticsComponent)
+      // }
+    ]
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./layouts/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
+    canActivate: [RoleGuard],
+    data: { roles: [UserRole.ADMIN] },
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'sellers',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'product-validation',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'categories',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'analytics',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'content',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'support',
+        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
       }
     ]
   },
@@ -35,23 +131,13 @@ export const routes: Routes = [
         path: '',
         loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
       },
-       {
+      {
         path: 'login',
         loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
       },
       {
         path: 'register',
         loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent)
-      }
-    ]
-  },
-  {
-    path:'admin',
-    loadComponent: () => import('./layouts/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./layouts/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent)
       }
     ]
   },

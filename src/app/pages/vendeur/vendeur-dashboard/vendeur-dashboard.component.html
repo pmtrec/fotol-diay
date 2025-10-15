@@ -1,0 +1,92 @@
+<div class="vendeur-dashboard">
+  <div class="dashboard-header">
+    <h1>Espace Vendeur</h1>
+    <p>Interface de gestion des produits</p>
+
+    <div class="dashboard-actions">
+      <button class="btn-primary" (click)="navigateToAddProduct()">
+        Ajouter un Produit
+      </button>
+
+      <a routerLink="/vendeur/products" class="btn-secondary">
+        Gérer mes Produits
+      </a>
+    </div>
+  </div>
+
+  <div class="products-section">
+    <div class="section-header">
+      <h2>Mes Produits</h2>
+
+      <!-- Filter buttons -->
+      <div class="filter-buttons">
+        <button
+          class="btn-filter"
+          [class.active]="currentFilter === 'all'"
+          (click)="showAllProducts()">
+          Tous ({{ products.length }})
+        </button>
+        <button
+          class="btn-filter"
+          [class.active]="currentFilter === 'pending'"
+          (click)="showPendingProducts()">
+          En Attente ({{ getPendingCount() }})
+        </button>
+        <button
+          class="btn-filter"
+          [class.active]="currentFilter === 'approved'"
+          (click)="showApprovedProducts()">
+          Approuvés ({{ getApprovedCount() }})
+        </button>
+        <button
+          class="btn-filter"
+          [class.active]="currentFilter === 'rejected'"
+          (click)="showRejectedProducts()">
+          Rejetés ({{ getRejectedCount() }})
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="loading">
+      <p>Chargement des produits...</p>
+    </div>
+
+    <!-- Products grid -->
+    <div *ngIf="!isLoading" class="products-grid">
+      <div *ngIf="filteredProducts.length === 0" class="no-products">
+        <p>Aucun produit trouvé pour ce filtre.</p>
+      </div>
+
+      <div *ngFor="let product of filteredProducts" class="product-card">
+        <div class="product-image">
+          <img [src]="product.images[0] || '/assets/images/no-image.png'"
+               [alt]="product.name"
+               onerror="this.src='/assets/images/no-image.png'">
+        </div>
+
+        <div class="product-info">
+          <h3>{{ product.name }}</h3>
+          <p class="product-description">{{ product.description }}</p>
+          <p class="product-price">{{ product.price | currency:'XOF':'symbol':'1.0-0' }}</p>
+          <p class="product-stock">Stock: {{ product.stock }}</p>
+
+          <div class="product-status">
+            <span [class]="getStatusClass(product.status)">
+              {{ getStatusLabel(product.status) }}
+            </span>
+          </div>
+
+          <div class="product-actions">
+            <button class="btn-edit" (click)="editProduct(product.id)">
+              Modifier
+            </button>
+            <button class="btn-delete" (click)="deleteProduct(product.id)">
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

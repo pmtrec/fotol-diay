@@ -31,7 +31,7 @@
     transition: background-color 0.3s;
 
     &:hover {
-      background-color: #0056b3;
+      background-color: #0066cc;
     }
   }
 }
@@ -109,7 +109,7 @@
       .qty-btn {
         width: 30px;
         height: 30px;
-        border: 1px solid #ddd;
+        border: 1px solid #dee2e6;
         background: white;
         border-radius: 4px;
         cursor: pointer;
@@ -124,7 +124,7 @@
       .qty-input {
         width: 60px;
         padding: 5px;
-        border: 1px solid #ddd;
+        border: 1px solid #dee2e6;
         border-radius: 4px;
         text-align: center;
       }

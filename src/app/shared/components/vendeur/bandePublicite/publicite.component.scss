@@ -1,0 +1,65 @@
+
+.bandeAnoncePub {
+  position: relative;
+  background: linear-gradient(90deg, #ffae00, #ff7800);
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+  z-index: 1000;
+  animation: slideDown 0.8s ease-out;
+}
+
+/* ✨ Texte publicitaire animé */
+.bandeAnoncePub-content p {
+  font-size: 1rem;
+  font-weight: 600;
+  animation: fadeInText 2s ease-in-out;
+}
+
+.bandeAnoncePub-content p strong {
+  text-transform: uppercase;
+}
+
+.bandeAnoncePub-content span {
+  color: #000;
+  background: #fff;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin: 0 3px;
+}
+
+.bandeAnoncePub-content a {
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.bandeAnoncePub-content a:hover {
+  text-decoration: none;
+  color: #000;
+}
+
+/* 🔽 Animation d’apparition */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* ✨ Apparition douce du texte */
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

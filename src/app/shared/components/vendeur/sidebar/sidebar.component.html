@@ -1,0 +1,149 @@
+<!-- 🎨 Sidebar vendeur moderne avec animations -->
+<aside class="sidebar">
+  <!-- En-tête avec informations utilisateur -->
+  <div class="sidebar-header">
+    <div class="user-profile">
+      <div class="profile-avatar">
+        <i class="fa-regular fa-user"></i>
+      </div>
+      <div class="profile-info">
+        <h3>Kasongo Vendeur</h3>
+        <p class="profile-role">Vendeur Premium</p>
+        <div class="profile-stats">
+          <span class="stat">
+            <i class="fa-solid fa-star"></i>
+            4.8★
+          </span>
+          <span class="stat">
+            <i class="fa-solid fa-shopping-cart"></i>
+            156 ventes
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu de navigation principal -->
+  <nav class="sidebar-nav">
+    <ul class="sidebar-menu">
+      <li class="menu-item" [class.active]="isActiveRoute('/vendeur/dashboard')" (click)="navigateTo('/vendeur/dashboard')">
+        <div class="menu-item-content">
+          <div class="menu-icon">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <span class="menu-text">Tableau de bord</span>
+          <div class="menu-indicator"></div>
+        </div>
+      </li>
+
+      <li class="menu-item" [class.active]="isActiveRoute('/vendeur/products')" (click)="navigateTo('/vendeur/products')">
+        <div class="menu-item-content">
+          <div class="menu-icon">
+            <i class="fa-solid fa-box"></i>
+          </div>
+          <span class="menu-text">Mes produits</span>
+          <span class="item-count">24</span>
+        </div>
+      </li>
+
+      <li class="menu-item cta-item" (click)="navigateTo('/vendeur/products/add')">
+        <div class="menu-item-content">
+          <div class="menu-icon featured">
+            <i class="fa-solid fa-plus-circle"></i>
+          </div>
+          <span class="menu-text">Ajouter produit</span>
+          <div class="cta-badge">Nouveau</div>
+        </div>
+      </li>
+
+      <li class="menu-item" (click)="navigateTo('/vendeur/boosts')">
+        <div class="menu-item-content">
+          <div class="menu-icon">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <span class="menu-text">Boosts & Promotions</span>
+          <span class="badge-orange">3</span>
+        </div>
+      </li>
+
+      <li class="menu-item premium-item" (click)="navigateTo('/vendeur/subscription')">
+        <div class="menu-item-content">
+          <div class="menu-icon premium">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <span class="menu-text">Abonnement Premium</span>
+          <div class="premium-badge">Pro</div>
+        </div>
+      </li>
+
+      <li class="menu-item" (click)="navigateTo('/vendeur/messages')">
+        <div class="menu-item-content">
+          <div class="menu-icon">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <span class="menu-text">Messages / WhatsApp</span>
+          <div class="pulse-dot"></div>
+        </div>
+      </li>
+
+      <li class="menu-item" (click)="navigateTo('/vendeur/notifications')">
+        <div class="menu-item-content">
+          <div class="menu-icon">
+            <i class="fa-regular fa-bell"></i>
+          </div>
+          <span class="menu-text">Notifications</span>
+          <span class="badge-red">7</span>
+        </div>
+      </li>
+
+      <li class="menu-item" (click)="navigateTo('/vendeur/settings')">
+        <div class="menu-item-content">
+          <div class="menu-icon">
+            <i class="fa-solid fa-gear"></i>
+          </div>
+          <span class="menu-text">Paramètres</span>
+        </div>
+      </li>
+
+      <li class="menu-item" (click)="navigateTo('/vendeur/support')">
+        <div class="menu-item-content">
+          <div class="menu-icon">
+            <i class="fa-solid fa-circle-question"></i>
+          </div>
+          <span class="menu-text">Support / FAQ</span>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Pied de sidebar avec actions -->
+  <div class="sidebar-footer">
+    <div class="quick-stats">
+      <div class="stat-item">
+        <span class="stat-label">Ventes du mois</span>
+        <span class="stat-value">1,247 €</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Commandes</span>
+        <span class="stat-value">23</span>
+      </div>
+    </div>
+
+    <button class="btn-contact" (click)="contactSupport()">
+      <div class="btn-content">
+        <i class="fa-solid fa-headset"></i>
+        <div class="btn-text">
+          <span class="btn-title">Support</span>
+          <span class="btn-subtitle">Besoin d'aide ?</span>
+        </div>
+      </div>
+      <div class="btn-glow"></div>
+    </button>
+
+    <!-- Indicateur de statut -->
+    <div class="status-indicator">
+      <div class="status-dot online"></div>
+      <span class="status-text">En ligne</span>
+    </div>
+  </div>
+</aside>

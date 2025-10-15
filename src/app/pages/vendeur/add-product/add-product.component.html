@@ -1,0 +1,251 @@
+<div class="add-product">
+  <div class="page-header">
+    <h1>Ajouter un Produit</h1>
+    <p>Ajoutez un nouveau produit à votre catalogue</p>
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+    <div class="form-row">
+      <!-- Informations de base -->
+      <div class="form-section">
+        <h2>Informations de Base</h2>
+
+        <div class="form-group">
+          <label for="name">Nom du Produit *</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            [class.invalid]="isFieldInvalid('name')"
+            placeholder="Entrez le nom du produit">
+          <div class="error-message" *ngIf="isFieldInvalid('name')">
+            {{getFieldError('name')}}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            [class.invalid]="isFieldInvalid('description')"
+            rows="4"
+            placeholder="Décrivez votre produit en détail..."></textarea>
+          <div class="error-message" *ngIf="isFieldInvalid('description')">
+            {{getFieldError('description')}}
+          </div>
+        </div>
+
+        <div class="form-row-inline">
+          <div class="form-group">
+            <label for="price">Prix (XAF) *</label>
+            <input
+              type="number"
+              id="price"
+              formControlName="price"
+              [class.invalid]="isFieldInvalid('price')"
+              placeholder="0"
+              min="0"
+              step="0.01">
+            <div class="error-message" *ngIf="isFieldInvalid('price')">
+              {{getFieldError('price')}}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="stock">Stock *</label>
+            <input
+              type="number"
+              id="stock"
+              formControlName="stock"
+              [class.invalid]="isFieldInvalid('stock')"
+              placeholder="0"
+              min="0">
+            <div class="error-message" *ngIf="isFieldInvalid('stock')">
+              {{getFieldError('stock')}}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Catégorie *</label>
+          <select
+            id="category"
+            formControlName="category"
+            [class.invalid]="isFieldInvalid('category')">
+            <option value="">Sélectionnez une catégorie</option>
+            <option *ngFor="let category of categories" [value]="category.name">
+              {{category.name}}
+            </option>
+          </select>
+          <div class="error-message" *ngIf="isFieldInvalid('category')">
+            {{getFieldError('category')}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Images du produit -->
+      <div class="form-section">
+        <h2>Images du Produit</h2>
+        <p class="section-description">
+          Ajoutez jusqu'à 3 images de votre produit. La première image sera utilisée comme image principale.
+        </p>
+
+        <div class="image-upload-area">
+           <!-- Boutons de capture caméra -->
+           <div class="camera-capture" *ngIf="selectedImages.length < 3 && !showCameraPreview && !showPhotoPreview">
+             <div class="camera-options">
+               <button
+                 type="button"
+                 class="camera-btn single"
+                 (click)="openCamera()"
+                 [disabled]="!isCameraAvailable()"
+                 title="Prendre une seule photo">
+                 <i class="icon-camera"></i>
+                 <span>Photo unique</span>
+               </button>
+
+               <button
+                 type="button"
+                 class="camera-btn reel"
+                 (click)="startPhotoReel()"
+                 [disabled]="!isCameraAvailable()"
+                 title="Prendre jusqu'à 3 photos en séquence">
+                 <i class="icon-camera-reel"></i>
+                 <span>Mode Reel (3 photos)</span>
+               </button>
+             </div>
+
+             <small *ngIf="!isCameraAvailable()" class="camera-notice">
+               Caméra non disponible sur ce navigateur
+             </small>
+           </div>
+
+          <!-- Prévisualisation caméra -->
+          <div class="camera-preview" *ngIf="showCameraPreview && !showPhotoPreview">
+            <div class="camera-container">
+              <video
+                id="cameraVideo"
+                autoplay
+                playsinline
+                muted
+                class="camera-video"
+                [class.reel-mode]="isCapturingReel">
+              </video>
+
+              <!-- Instructions pour le mode reel -->
+              <div class="reel-instructions" *ngIf="isCapturingReel">
+                <div class="reel-counter">
+                  <span class="current">{{ currentReelStep + 1 }}</span>
+                  <span class="separator">/</span>
+                  <span class="total">3</span>
+                </div>
+                <p class="reel-text">
+                  <span *ngIf="currentReelStep === 0">Préparez-vous pour la première photo...</span>
+                  <span *ngIf="currentReelStep === 1">Deuxième photo...</span>
+                  <span *ngIf="currentReelStep === 2">Troisième et dernière photo...</span>
+                </p>
+              </div>
+
+              <div class="camera-controls">
+                <button
+                  *ngIf="!isCapturingReel"
+                  type="button"
+                  class="preview-btn"
+                  (click)="previewPhoto()"
+                  title="Prévisualiser la photo">
+                  <i class="icon-eye"></i>
+                </button>
+
+                <button
+                  type="button"
+                  class="capture-btn"
+                  (click)="isCapturingReel ? captureReelPhoto() : captureImage()"
+                  title="Prendre la photo"
+                  [class.reel-capture]="isCapturingReel">
+                  <i class="icon-camera"></i>
+                  <span *ngIf="isCapturingReel">{{ currentReelStep + 1 }}/3</span>
+                </button>
+
+                <button
+                  *ngIf="isCapturingReel"
+                  type="button"
+                  class="cancel-reel-btn"
+                  (click)="cancelPhotoReel()"
+                  title="Annuler le mode reel">
+                  <i class="icon-close"></i>
+                </button>
+                <button
+                  *ngIf="!isCapturingReel"
+                  type="button"
+                  class="close-btn"
+                  (click)="closeCamera()"
+                  title="Fermer la caméra">
+                  <i class="icon-close"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prévisualisation de la photo -->
+          <div class="photo-preview-modal" *ngIf="showPhotoPreview">
+            <div class="preview-container">
+              <div class="preview-header">
+                <h3>Prévisualisation</h3>
+                <p>Voulez-vous garder cette photo ?</p>
+              </div>
+
+              <div class="preview-image">
+                <img [src]="previewImageUrl || ''" alt="Prévisualisation">
+              </div>
+
+              <div class="preview-actions">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="cancelPreviewPhoto()">
+                  Reprendre
+                </button>
+                <button
+                  type="button"
+                  class="btn-primary"
+                  (click)="confirmPreviewPhoto()">
+                  Confirmer
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="images-preview" *ngIf="selectedImages.length > 0">
+            <div class="image-item" *ngFor="let image of selectedImages; let i = index">
+              <img [src]="image" [alt]="'Image ' + (i + 1)">
+              <button type="button" class="remove-image" (click)="removeImage(i)">
+                <i class="icon-close"></i>
+              </button>
+              <div class="image-overlay" *ngIf="i === 0">
+                <span>Image principale</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="selectedImages.length === 0">
+          <div class="error-message">
+            Au moins une image est requise
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="navigateBack()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+        <span *ngIf="!isSubmitting">Publier le Produit</span>
+        <span *ngIf="isSubmitting">Publication en cours...</span>
+      </button>
+    </div>
+  </form>
+</div>

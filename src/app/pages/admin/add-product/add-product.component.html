@@ -1,0 +1,172 @@
+<div class="add-product">
+  <div class="page-header">
+    <h1>Ajouter un Produit</h1>
+    <p>Ajoutez un nouveau produit à votre catalogue</p>
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+    <div class="form-row">
+      <!-- Informations de base -->
+      <div class="form-section">
+        <h2>Informations de Base</h2>
+
+        <div class="form-group">
+          <label for="name">Nom du Produit *</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            [class.invalid]="isFieldInvalid('name')"
+            placeholder="Entrez le nom du produit">
+          <div class="error-message" *ngIf="isFieldInvalid('name')">
+            {{getFieldError('name')}}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            [class.invalid]="isFieldInvalid('description')"
+            rows="4"
+            placeholder="Décrivez votre produit en détail..."></textarea>
+          <div class="error-message" *ngIf="isFieldInvalid('description')">
+            {{getFieldError('description')}}
+          </div>
+        </div>
+
+        <div class="form-row-inline">
+          <div class="form-group">
+            <label for="price">Prix (XAF) *</label>
+            <input
+              type="number"
+              id="price"
+              formControlName="price"
+              [class.invalid]="isFieldInvalid('price')"
+              placeholder="0"
+              min="0"
+              step="0.01">
+            <div class="error-message" *ngIf="isFieldInvalid('price')">
+              {{getFieldError('price')}}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="stock">Stock *</label>
+            <input
+              type="number"
+              id="stock"
+              formControlName="stock"
+              [class.invalid]="isFieldInvalid('stock')"
+              placeholder="0"
+              min="0">
+            <div class="error-message" *ngIf="isFieldInvalid('stock')">
+              {{getFieldError('stock')}}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Catégorie *</label>
+          <select
+            id="category"
+            formControlName="category"
+            [class.invalid]="isFieldInvalid('category')">
+            <option value="">Sélectionnez une catégorie</option>
+            <option *ngFor="let category of categories" [value]="category.name">
+              {{category.name}}
+            </option>
+          </select>
+          <div class="error-message" *ngIf="isFieldInvalid('category')">
+            {{getFieldError('category')}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Images du produit -->
+      <div class="form-section">
+        <h2>Images du Produit</h2>
+        <p class="section-description">
+          Ajoutez jusqu'à 3 images de votre produit. La première image sera utilisée comme image principale.
+        </p>
+
+        <div class="image-upload-area">
+          <!-- Bouton de capture caméra -->
+          <div class="camera-capture" *ngIf="selectedImages.length < 3 && !showCameraPreview">
+            <button
+              type="button"
+              class="camera-btn"
+              (click)="openCamera()"
+              [disabled]="!isCameraAvailable()"
+              title="Ouvrir la caméra pour prendre une photo">
+              <i class="icon-camera"></i>
+              <span>Ouvrir la caméra</span>
+            </button>
+            <small *ngIf="!isCameraAvailable()" class="camera-notice">
+              Caméra non disponible sur ce navigateur
+            </small>
+          </div>
+
+          <!-- Prévisualisation caméra -->
+          <div class="camera-preview" *ngIf="showCameraPreview">
+            <div class="camera-container">
+              <video
+                id="cameraVideo"
+                autoplay
+                playsinline
+                muted
+                class="camera-video">
+              </video>
+              <div class="camera-controls">
+                <button
+                  type="button"
+                  class="capture-btn"
+                  (click)="captureImage()"
+                  title="Prendre la photo">
+                  <i class="icon-camera"></i>
+                </button>
+                <button
+                  type="button"
+                  class="close-btn"
+                  (click)="closeCamera()"
+                  title="Fermer la caméra">
+                  <i class="icon-close"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="images-preview" *ngIf="selectedImages.length > 0">
+            <div class="image-item" *ngFor="let image of selectedImages; let i = index">
+              <img [src]="image" [alt]="'Image ' + (i + 1)">
+              <button type="button" class="remove-image" (click)="removeImage(i)">
+                <i class="icon-close"></i>
+              </button>
+              <div class="image-overlay" *ngIf="i === 0">
+                <span>Image principale</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="selectedImages.length === 0">
+          <div class="error-message">
+            Au moins une image est requise
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="navigateBack()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+        <span *ngIf="!isSubmitting">Publier le Produit</span>
+        <span *ngIf="isSubmitting">Publication en cours...</span>
+      </button>
+    </div>
+  </form>
+</div>

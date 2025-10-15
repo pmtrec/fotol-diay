@@ -1,0 +1,407 @@
+/* 🎨 Footer vendeur moderne - Design amélioré */
+:host {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+}
+
+.footer {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1f1f1f 100%);
+  color: #e5e7eb;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff7700, #ff5500, #ff7700);
+    animation: footerGlow 4s infinite;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(255, 119, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 85, 0, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+@keyframes footerGlow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem 2rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 4rem 3rem 2rem;
+  }
+}
+
+/* 🌟 Logo et description */
+.footer-logo {
+  display: flex;
+  flex-direction: column;
+
+  h1.logo {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ff7700;
+    margin: 0 0 1rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05) rotate(1deg);
+      text-shadow: 2px 2px 8px rgba(255, 119, 0, 0.3);
+      filter: drop-shadow(0 0 10px rgba(255, 119, 0, 0.3));
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #ff7700, #ff5500);
+      border-radius: 2px;
+      animation: logoUnderline 3s infinite;
+    }
+  }
+
+  @keyframes logoUnderline {
+    0%, 100% { width: 60px; }
+    50% { width: 80px; }
+  }
+
+  p {
+    color: #9ca3af;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+/* 🔗 Liens de navigation */
+.footer-links,
+.footer-support {
+  h3 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    font-size: 1.1rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background: linear-gradient(90deg, #ff7700, #ff5500);
+      border-radius: 1px;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin-bottom: 0.8rem;
+
+      a {
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        position: relative;
+        padding: 0.3rem 0;
+        display: inline-block;
+
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #ff7700, #ff5500);
+          transition: width 0.3s ease;
+        }
+
+        &:hover {
+          color: #ff7700;
+          transform: translateX(5px);
+
+          &::before {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 📧 Newsletter moderne */
+.footer-newsletter {
+  h3 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #fff;
+    font-size: 1.1rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background: linear-gradient(90deg, #ff7700, #ff5500);
+      border-radius: 1px;
+    }
+  }
+
+  p {
+    color: #9ca3af;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    input[type='email'] {
+      flex: 1;
+      padding: 0.9rem 1.2rem;
+      border: 2px solid rgba(255, 119, 0, 0.2);
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+
+      &:focus {
+        border-color: #ff7700;
+        box-shadow: 0 0 20px rgba(255, 119, 0, 0.3);
+        background: rgba(255, 119, 0, 0.05);
+        transform: translateY(-2px);
+      }
+    }
+
+    button {
+      padding: 0.9rem 1.8rem;
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: linear-gradient(135deg, #ff7700, #ff5500);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 119, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, #ff5500, #ff3300);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 6px 20px rgba(255, 119, 0, 0.4);
+
+        &::before {
+          left: 100%;
+        }
+      }
+
+      &:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      i {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+}
+
+/* 📊 Barre inférieure */
+.bottom-bar {
+  background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+  border-top: 1px solid rgba(255, 119, 0, 0.2);
+  margin-top: 3rem;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #ff7700, transparent);
+  }
+
+  p {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+
+    a {
+      color: #ff7700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #ff5500;
+        text-shadow: 0 0 8px rgba(255, 119, 0, 0.5);
+      }
+    }
+  }
+}
+
+/* 📱 Design responsive amélioré */
+@media (max-width: 768px) {
+  .footer-grid {
+    padding: 3rem 1rem 1rem;
+    gap: 2.5rem;
+  }
+
+  .footer-logo h1.logo {
+    font-size: 1.8rem;
+  }
+
+  .newsletter-form {
+    input[type='email'],
+    button {
+      padding: 1rem;
+    }
+  }
+
+  .bottom-bar {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer-logo h1.logo {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .footer-links,
+  .footer-support,
+  .footer-newsletter {
+    text-align: center;
+
+    h3::after {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+/* ✨ Animations et effets avancés */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.footer-logo,
+.footer-links,
+.footer-support,
+.footer-newsletter {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.footer-links { animation-delay: 0.1s; }
+.footer-support { animation-delay: 0.2s; }
+.footer-newsletter { animation-delay: 0.3s; }
+
+/* 🎯 Focus et accessibilité */
+a:focus,
+button:focus,
+input:focus {
+  outline: 2px solid #ff7700;
+  outline-offset: 2px;
+}
+
+/* 🌙 Mode sombre amélioré */
+@media (prefers-color-scheme: dark) {
+  .footer {
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+  }
+}

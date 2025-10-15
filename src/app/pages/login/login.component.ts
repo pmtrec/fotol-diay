@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { UserRole } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -14,34 +16,41 @@ export class LoginComponent {
   username = '';
   password = '';
   errorMessage = '';
+  isLoading = false;
 
-  // 🧠 Simulation d'une "base de données" locale
-  private mockUsers = [
-    { username: 'admin', password: '123456', role: 'admin' },
-    { username: 'kasongo', password: 'dev2025', role: 'user' },
-    { username: 'guest', password: 'guest', role: 'visitor' }
-  ];
+  constructor(private router: Router, private authService: AuthService) {}
 
-  constructor(private router: Router) {}
+  async onSubmit() {
+    if (!this.username || !this.password) {
+      this.errorMessage = 'Veuillez remplir tous les champs.';
+      return;
+    }
 
-  onSubmit() {
-    const foundUser = this.mockUsers.find(
-      user => user.username === this.username && user.password === this.password
-    );
+    this.isLoading = true;
+    this.errorMessage = '';
 
-    if (foundUser) {
-      console.log('✅ Connexion réussie:', foundUser);
-      localStorage.setItem('currentUser', JSON.stringify(foundUser));
+    try {
+      const user = await this.authService.login({
+        email: this.username,
+        password: this.password
+      });
+
+      console.log('✅ Connexion réussie:', user);
 
       // 🟢 Redirection selon le rôle (ou par défaut vers home)
-      if (foundUser.role === 'admin') {
+      if (user.role === UserRole.ADMIN) {
         this.router.navigate(['/admin']);
+      } else if (user.role === UserRole.SELLER) {
+        this.router.navigate(['/vendeur']);
       } else {
         this.router.navigate(['/dashboard']);
       }
-    } else {
-      console.warn('❌ Identifiants invalides');
-      this.errorMessage = 'Nom d’utilisateur ou mot de passe incorrect.';
+    } catch (error) {
+      console.error('❌ Erreur de connexion:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Nom d\'utilisateur ou mot de passe incorrect.';
+      this.errorMessage = errorMessage;
+    } finally {
+      this.isLoading = false;
     }
   }
 

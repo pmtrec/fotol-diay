@@ -1,0 +1,373 @@
+/* 🎨 Layout principal vendeur - Design moderne et élégant */
+.vendeur-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* 📱 Navbar fixe avec design moderne */
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+/* 🎯 Conteneur principal avec sidebar et contenu */
+.vendeur-container {
+  display: flex;
+  margin-top: 70px;
+  min-height: calc(100vh - 70px);
+  position: relative;
+}
+
+/* 📊 Sidebar moderne avec animations */
+.vendeur-sidebar {
+  width: 300px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9ff 100%);
+  border-right: 2px solid rgba(255, 119, 0, 0.1);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #ff7700, #ff5500);
+    transition: width 0.3s ease;
+  }
+
+  &:hover::before {
+    width: 6px;
+  }
+
+  &.sidebar-collapsed {
+    transform: translateX(-100%);
+
+    &::before {
+      width: 0;
+    }
+  }
+
+  .sidebar-header {
+    padding: 2rem 1.5rem;
+    background: linear-gradient(135deg, rgba(255, 119, 0, 0.05), rgba(255, 85, 0, 0.03));
+    border-bottom: 1px solid rgba(255, 119, 0, 0.1);
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #ff7700;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #ff7700, #ff5500);
+        border-radius: 2px;
+      }
+    }
+  }
+
+  .sidebar-nav {
+    padding: 1rem 0;
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .nav-item {
+        margin-bottom: 0.5rem;
+
+        .nav-link {
+          display: flex;
+          align-items: center;
+          padding: 1rem 1.5rem;
+          color: #495057;
+          text-decoration: none;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          border-radius: 0 25px 25px 0;
+          margin-right: 1rem;
+
+          i {
+            margin-right: 1rem;
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+          }
+
+          span {
+            font-weight: 500;
+            transition: all 0.3s ease;
+          }
+
+          &:hover {
+            background: linear-gradient(135deg, rgba(255, 119, 0, 0.1), rgba(255, 85, 0, 0.05));
+            color: #ff7700;
+            transform: translateX(5px);
+            box-shadow: 3px 5px 15px rgba(255, 119, 0, 0.2);
+
+            i {
+              transform: scale(1.1);
+              color: #ff7700;
+            }
+          }
+
+          &.active {
+            background: linear-gradient(135deg, #ff7700, #ff5500);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 119, 0, 0.4);
+
+            i {
+              color: white;
+              transform: scale(1.1);
+            }
+
+            &::before {
+              content: '';
+              position: absolute;
+              left: -2px;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 4px;
+              height: 60%;
+              background: white;
+              border-radius: 0 4px 4px 0;
+            }
+          }
+        }
+      }
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 119, 0, 0.1);
+      background: linear-gradient(135deg, rgba(255, 119, 0, 0.02), rgba(255, 85, 0, 0.01));
+
+      .btn-logout {
+        width: 100%;
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border: none;
+        color: white;
+        padding: 0.8rem 1.2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+
+        &:hover {
+          background: linear-gradient(135deg, #c82333, #a71e2a);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        i {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+/* 📄 Zone de contenu principale */
+.vendeur-content {
+  flex: 1;
+  padding: 2rem;
+  background: transparent;
+  overflow-y: auto;
+  position: relative;
+
+  .content-wrapper {
+    max-width: 100%;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    min-height: calc(100vh - 140px);
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+/* 📱 Design responsive moderne */
+@media (max-width: 1024px) {
+  .vendeur-sidebar {
+    width: 280px;
+  }
+
+  .navbar-container {
+    padding: 0 1rem;
+  }
+
+  .vendeur-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .vendeur-sidebar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    height: calc(100vh - 70px);
+    z-index: 999;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+
+    &.sidebar-collapsed {
+      transform: translateX(0);
+    }
+
+    &::before {
+      width: 0;
+    }
+
+    &:hover::before {
+      width: 0;
+    }
+  }
+
+  .vendeur-content {
+    padding: 1rem;
+
+    .content-wrapper {
+      padding: 1rem;
+      min-height: calc(100vh - 100px);
+    }
+  }
+
+  .navbar-container {
+    height: 60px;
+    margin-top: 0;
+  }
+
+  .vendeur-container {
+    margin-top: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-container {
+    padding: 0 0.5rem;
+  }
+
+  .vendeur-content {
+    padding: 0.5rem;
+
+    .content-wrapper {
+      padding: 0.8rem;
+    }
+  }
+}
+
+/* 🎨 Animations et transitions fluides */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* ✨ Icônes avec effets modernes */
+.icon-dashboard::before { content: "📊"; }
+.icon-products::before { content: "📦"; }
+.icon-add::before { content: "➕"; }
+.icon-orders::before { content: "📋"; }
+.icon-profile::before { content: "👤"; }
+.icon-analytics::before { content: "📈"; }
+.icon-logout::before { content: "🚪"; }
+.icon-menu::before { content: "☰"; }
+
+/* 🌟 Effets de survol avancés */
+.nav-item {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 119, 0, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+/* 🎯 Focus et accessibilité */
+.nav-link:focus,
+.btn-logout:focus {
+  outline: 2px solid #ff7700;
+  outline-offset: 2px;
+}
+
+/* 📱 Animation d'ouverture/fermeture de sidebar */
+.sidebar-entering {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.sidebar-entered {
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-exiting {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.sidebar-exited {
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

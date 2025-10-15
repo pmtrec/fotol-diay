@@ -1,0 +1,223 @@
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-plus-circle me-2"></i>
+            Ajouter un Nouveau Produit
+          </h3>
+        </div>
+
+        <div class="card-body">
+          <form [formGroup]="produitForm" (ngSubmit)="onSubmit()" novalidate>
+
+            <!-- Informations générales du produit -->
+            <div class="row">
+              <div class="col-md-8">
+                <h5 class="mb-3">Informations du Produit</h5>
+
+                <!-- Nom du produit -->
+                <div class="mb-3">
+                  <label for="nom" class="form-label">Nom du Produit *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nom"
+                    formControlName="nom"
+                    placeholder="Entrez le nom du produit"
+                    [class.is-invalid]="nom?.invalid && nom?.touched">
+                  <div class="invalid-feedback" *ngIf="nom?.invalid && nom?.touched">
+                    <span *ngIf="nom?.errors?.['required']">Le nom est obligatoire.</span>
+                    <span *ngIf="nom?.errors?.['minlength']">Le nom doit contenir au moins 2 caractères.</span>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                  <label for="description" class="form-label">Description *</label>
+                  <textarea
+                    class="form-control"
+                    id="description"
+                    rows="4"
+                    formControlName="description"
+                    placeholder="Décrivez votre produit en détail..."
+                    [class.is-invalid]="description?.invalid && description?.touched">
+                  </textarea>
+                  <div class="invalid-feedback" *ngIf="description?.invalid && description?.touched">
+                    <span *ngIf="description?.errors?.['required']">La description est obligatoire.</span>
+                    <span *ngIf="description?.errors?.['minlength']">La description doit contenir au moins 10 caractères.</span>
+                  </div>
+                </div>
+
+                <!-- Prix et Stock -->
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="prix" class="form-label">Prix (FCFA) *</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="prix"
+                        formControlName="prix"
+                        placeholder="0"
+                        min="0"
+                        step="0.01"
+                        [class.is-invalid]="prix?.invalid && prix?.touched">
+                      <div class="invalid-feedback" *ngIf="prix?.invalid && prix?.touched">
+                        <span *ngIf="prix?.errors?.['required']">Le prix est obligatoire.</span>
+                        <span *ngIf="prix?.errors?.['min']">Le prix doit être positif.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="stock" class="form-label">Stock *</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="stock"
+                        formControlName="stock"
+                        placeholder="0"
+                        min="0"
+                        [class.is-invalid]="stock?.invalid && stock?.touched">
+                      <div class="invalid-feedback" *ngIf="stock?.invalid && stock?.touched">
+                        <span *ngIf="stock?.errors?.['required']">Le stock est obligatoire.</span>
+                        <span *ngIf="stock?.errors?.['min']">Le stock ne peut pas être négatif.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Catégorie -->
+                <div class="mb-3">
+                  <label for="categorie" class="form-label">Catégorie *</label>
+                  <select
+                    class="form-select"
+                    id="categorie"
+                    formControlName="categorie"
+                    [class.is-invalid]="categorie?.invalid && categorie?.touched">
+                    <option value="">Sélectionnez une catégorie</option>
+                    <option *ngFor="let cat of categories" [value]="cat.name">
+                      {{ cat.name }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="categorie?.invalid && categorie?.touched">
+                    La catégorie est obligatoire.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section Photo -->
+              <div class="col-md-4">
+                <h5 class="mb-3">Photo du Produit</h5>
+
+                <!-- Zone caméra -->
+                <div class="mb-3" *ngIf="!capturedPhoto">
+                  <div class="camera-container">
+                    <video
+                      #videoElement
+                      *ngIf="isCameraOpen"
+                      class="video-preview"
+                      autoplay
+                      playsinline
+                      muted>
+                    </video>
+
+                    <div *ngIf="!isCameraOpen" class="camera-placeholder">
+                      <i class="fas fa-camera fa-3x text-muted mb-2"></i>
+                      <p class="text-muted">Aucune caméra active</p>
+                    </div>
+                  </div>
+
+                  <!-- Boutons caméra -->
+                  <div class="d-grid gap-2 mt-2">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      (click)="startCamera()"
+                      [disabled]="isCameraOpen">
+                      <i class="fas fa-video me-2"></i>
+                      Ouvrir la Caméra
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-success"
+                      (click)="capturePhoto()"
+                      [disabled]="!isStreaming">
+                      <i class="fas fa-camera me-2"></i>
+                      Capturer la Photo
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      (click)="stopCamera()"
+                      [disabled]="!isCameraOpen">
+                      <i class="fas fa-stop me-2"></i>
+                      Arrêter la Caméra
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Aperçu de la photo capturée -->
+                <div *ngIf="capturedPhoto" class="captured-photo-container">
+                  <h6>Photo Capturée:</h6>
+                  <img [src]="capturedPhoto" alt="Photo du produit" class="img-fluid rounded mb-2">
+
+                  <!-- Badge Photo Certifiée -->
+                  <div *ngIf="badgeCertifie" class="badge-certifie">
+                    <span class="badge bg-success">
+                      <i class="fas fa-certificate me-1"></i>
+                      Photo Certifiée
+                    </span>
+                  </div>
+
+                  <!-- Bouton pour reprendre une photo -->
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary btn-sm mt-2"
+                    (click)="capturedPhoto = null; badgeCertifie = false; startCamera()">
+                    <i class="fas fa-redo me-1"></i>
+                    Reprendre la Photo
+                  </button>
+                </div>
+
+                <!-- Aperçu de la photo floutée -->
+                <div *ngIf="blurredPhoto" class="blurred-photo-container mt-3">
+                  <h6>Aperçu Flouté:</h6>
+                  <img [src]="blurredPhoto" alt="Aperçu flouté du produit" class="img-fluid rounded mb-2">
+                  <small class="text-muted d-block">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Cette version floutée sera utilisée pour la prévisualisation
+                  </small>
+                </div>
+
+                <!-- Canvas caché pour le traitement d'image -->
+                <canvas #canvasElement style="display: none;"></canvas>
+              </div>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="d-grid">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-lg"
+                    [disabled]="produitForm.invalid || !capturedPhoto || isSubmitting">
+                    <i class="fas fa-save me-2" *ngIf="!isSubmitting"></i>
+                    <i class="fas fa-spinner fa-spin me-2" *ngIf="isSubmitting"></i>
+                    {{ isSubmitting ? 'Ajout...' : 'Ajouter le Produit' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
