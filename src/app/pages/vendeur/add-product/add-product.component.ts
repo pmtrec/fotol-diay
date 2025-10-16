@@ -77,15 +77,29 @@ export class AddProductComponent implements OnInit, OnDestroy {
   }
 
   onImageSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file && this.selectedImages.length < 3) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        this.selectedImages.push(imageUrl);
-        this.imagesFormArray.push(this.fb.control(imageUrl));
-      };
-      reader.readAsDataURL(file);
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const filesToProcess = Array.from(files).slice(0, 3 - this.selectedImages.length);
+
+      filesToProcess.forEach((file: any) => {
+        if (file && this.selectedImages.length < 3) {
+          const currentUser = this.authService.getCurrentUser();
+
+          this.imageUploadService.uploadImage(file, currentUser?.id).subscribe({
+            next: (imageUrl) => {
+              this.selectedImages.push(imageUrl);
+              this.imagesFormArray.push(this.fb.control(imageUrl));
+            },
+            error: (error) => {
+              console.error('Erreur lors de l\'upload de l\'image:', error);
+              alert(`Erreur lors de l'upload: ${error.message || error}`);
+            }
+          });
+        }
+      });
+
+      // Clear the input value to allow selecting the same file again
+      event.target.value = '';
     }
   }
 

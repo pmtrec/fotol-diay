@@ -1,0 +1,118 @@
+<div class="admin-validation">
+  <div class="page-header">
+    <h1>Validation des Produits</h1>
+    <p>Approuvez ou rejetez les produits soumis par les vendeurs</p>
+  </div>
+
+  <!-- Action message -->
+  <div *ngIf="actionMessage" class="action-message" [ngClass]="actionMessageType">
+    {{ actionMessage }}
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading">
+    <p>Chargement des produits en attente...</p>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && produitsEnAttente.length === 0" class="empty-state">
+    <div class="empty-content">
+      <h2>Aucun produit en attente</h2>
+      <p>Tous les produits ont été traités.</p>
+    </div>
+  </div>
+
+  <!-- Products list -->
+  <div *ngIf="!isLoading && produitsEnAttente.length > 0" class="products-list">
+    <div class="product-item" *ngFor="let produit of produitsEnAttente">
+      <div class="product-image">
+        <img [src]="produit.photoFlouDataUrl" [alt]="produit.nom" class="blurred-image">
+        <div class="image-overlay">
+          <button
+            type="button"
+            class="btn-view-real"
+            (click)="openRealPhotoModal(produit)"
+            title="Voir la photo réelle">
+            Voir photo réelle
+          </button>
+        </div>
+      </div>
+
+      <div class="product-details">
+        <div class="product-header">
+          <h3 class="product-name">{{ produit.nom }}</h3>
+          <div class="product-meta">
+            <span class="vendeur">{{ getVendeurInfo(produit.vendeurId) }}</span>
+            <span class="date">{{ formatDate(produit.dateAjout) }}</span>
+          </div>
+        </div>
+
+        <div class="product-info">
+          <div class="info-group">
+            <label>Description:</label>
+            <p>{{ produit.description }}</p>
+          </div>
+
+          <div class="info-group">
+            <label>Catégorie:</label>
+            <p>{{ produit.categorie }}</p>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <label>Prix:</label>
+              <span class="value">{{ produit.prix | currency:'XAF':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Stock:</label>
+              <span class="value">{{ produit.stock }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-actions">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="approuverProduit(produit)"
+          title="Approuver le produit">
+          ✅ Approuver
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="rejeterProduit(produit)"
+          title="Rejeter le produit">
+          ❌ Rejeter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real photo modal -->
+  <div *ngIf="showRealPhotoModal" class="modal-overlay" (click)="closeRealPhotoModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedProductForModal?.nom }}</h2>
+        <button type="button" class="btn-close" (click)="closeRealPhotoModal()">
+          ×
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <img
+          *ngIf="selectedProductForModal"
+          [src]="selectedProductForModal.photoDataUrl"
+          [alt]="selectedProductForModal.nom"
+          class="real-photo">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeRealPhotoModal()">
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

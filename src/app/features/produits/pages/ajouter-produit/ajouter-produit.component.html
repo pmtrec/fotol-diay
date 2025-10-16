@@ -113,90 +113,76 @@
               <div class="col-md-4">
                 <h5 class="mb-3">Photo du Produit</h5>
 
-                <!-- Zone caméra -->
-                <div class="mb-3" *ngIf="!capturedPhoto">
-                  <div class="camera-container">
-                    <video
-                      #videoElement
-                      *ngIf="isCameraOpen"
-                      class="video-preview"
-                      autoplay
-                      playsinline
-                      muted>
-                    </video>
-
-                    <div *ngIf="!isCameraOpen" class="camera-placeholder">
-                      <i class="fas fa-camera fa-3x text-muted mb-2"></i>
-                      <p class="text-muted">Aucune caméra active</p>
+                <!-- Zone d'upload d'image -->
+                <div class="mb-3" *ngIf="!photoUrl">
+                  <div class="upload-container">
+                    <div class="upload-placeholder">
+                      <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-2"></i>
+                      <p class="text-muted">Sélectionnez une photo du produit</p>
                     </div>
                   </div>
 
-                  <!-- Boutons caméra -->
+                  <!-- Input file caché -->
+                  <input
+                    type="file"
+                    #fileInput
+                    accept="image/*"
+                    capture="environment"
+                    (change)="onFileSelected($event)"
+                    style="display: none;">
+
+                  <!-- Boutons d'upload -->
                   <div class="d-grid gap-2 mt-2">
                     <button
                       type="button"
                       class="btn btn-outline-primary"
-                      (click)="startCamera()"
-                      [disabled]="isCameraOpen">
-                      <i class="fas fa-video me-2"></i>
-                      Ouvrir la Caméra
-                    </button>
-
-                    <button
-                      type="button"
-                      class="btn btn-success"
-                      (click)="capturePhoto()"
-                      [disabled]="!isStreaming">
+                      (click)="fileInput.click()"
+                      [disabled]="isUploading">
                       <i class="fas fa-camera me-2"></i>
-                      Capturer la Photo
+                      📸 Prendre une photo réelle
                     </button>
 
                     <button
                       type="button"
-                      class="btn btn-outline-danger"
-                      (click)="stopCamera()"
-                      [disabled]="!isCameraOpen">
-                      <i class="fas fa-stop me-2"></i>
-                      Arrêter la Caméra
+                      class="btn btn-outline-secondary"
+                      (click)="fileInput.click()"
+                      [disabled]="isUploading">
+                      <i class="fas fa-folder me-2"></i>
+                      Choisir depuis la galerie
                     </button>
+                  </div>
+
+                  <!-- Loader pendant l'upload -->
+                  <div *ngIf="isUploading" class="upload-loader mt-2">
+                    <div class="d-flex align-items-center">
+                      <div class="spinner-border spinner-border-sm me-2" role="status">
+                        <span class="visually-hidden">Envoi...</span>
+                      </div>
+                      <span>Envoi de l'image en cours...</span>
+                    </div>
+                  </div>
+
+                  <!-- Message d'erreur -->
+                  <div *ngIf="uploadError" class="alert alert-danger mt-2" role="alert">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    {{ uploadError }}
                   </div>
                 </div>
 
-                <!-- Aperçu de la photo capturée -->
-                <div *ngIf="capturedPhoto" class="captured-photo-container">
-                  <h6>Photo Capturée:</h6>
-                  <img [src]="capturedPhoto" alt="Photo du produit" class="img-fluid rounded mb-2">
+                <!-- Aperçu de la photo sélectionnée -->
+                <div *ngIf="photoUrl" class="photo-preview-container">
+                  <h6>Photo sélectionnée:</h6>
+                  <img [src]="previewUrl" alt="Photo du produit" class="img-fluid rounded mb-2">
 
-                  <!-- Badge Photo Certifiée -->
-                  <div *ngIf="badgeCertifie" class="badge-certifie">
-                    <span class="badge bg-success">
-                      <i class="fas fa-certificate me-1"></i>
-                      Photo Certifiée
-                    </span>
-                  </div>
-
-                  <!-- Bouton pour reprendre une photo -->
+                  <!-- Bouton pour supprimer la photo -->
                   <button
                     type="button"
-                    class="btn btn-outline-primary btn-sm mt-2"
-                    (click)="capturedPhoto = null; badgeCertifie = false; startCamera()">
-                    <i class="fas fa-redo me-1"></i>
-                    Reprendre la Photo
+                    class="btn btn-outline-danger btn-sm mt-2"
+                    (click)="removeImage()">
+                    <i class="fas fa-trash me-1"></i>
+                    Supprimer la photo
                   </button>
                 </div>
-
-                <!-- Aperçu de la photo floutée -->
-                <div *ngIf="blurredPhoto" class="blurred-photo-container mt-3">
-                  <h6>Aperçu Flouté:</h6>
-                  <img [src]="blurredPhoto" alt="Aperçu flouté du produit" class="img-fluid rounded mb-2">
-                  <small class="text-muted d-block">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Cette version floutée sera utilisée pour la prévisualisation
-                  </small>
-                </div>
-
-                <!-- Canvas caché pour le traitement d'image -->
-                <canvas #canvasElement style="display: none;"></canvas>
               </div>
             </div>
 

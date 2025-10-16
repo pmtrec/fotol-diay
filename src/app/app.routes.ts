@@ -22,6 +22,10 @@ export const routes: Routes = [
       {
         path: 'cart',
         loadComponent: () => import('./pages/cart/cart.component').then(m => m.CartComponent)
+      },
+      {
+        path: 'produits/ajouter',
+        loadComponent: () => import('./features/produits/pages/ajouter-produit/ajouter-produit.component').then(m => m.AjouterProduitComponent)
       }
     ]
   },
@@ -51,6 +55,10 @@ export const routes: Routes = [
       {
         path: 'products/add',
         loadComponent: () => import('./pages/vendeur/add-product/add-product.component').then(m => m.AddProductComponent)
+      },
+      {
+        path: 'mes-produits',
+        loadComponent: () => import('./features/produits/pages/mes-produits/mes-produits.component').then(m => m.MesProduitsComponent)
       },
       // {
       //   path: 'products/edit/:id',
@@ -96,6 +104,10 @@ export const routes: Routes = [
       {
         path: 'product-validation',
         loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+      },
+      {
+        path: 'validation-produits',
+        loadComponent: () => import('./features/produits/pages/admin-validation/admin-validation.component').then(m => m.AdminValidationComponent)
       },
       {
         path: 'categories',

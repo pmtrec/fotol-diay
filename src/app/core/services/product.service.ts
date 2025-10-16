@@ -1,7 +1,29 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { Category } from '../models/category.model';
-import { Product, ProductStatus } from '../models/product.model';
+
+// Interface Produit selon les spécifications
+export interface Produit {
+  id: number;
+  nom: string;
+  description: string;
+  prix: number;
+  categorie: string;
+  stock: number;
+  imageUrl: string;
+  vendeurId?: number;
+  statut: 'pending' | 'approved' | 'rejected';
+  dateAjout: string;
+  photoFlouDataUrl?: string;
+  photoDataUrl?: string;
+  rating?: number;
+  images?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+  validatedBy?: number;
+  validatedAt?: Date;
+  rejectionReason?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +31,7 @@ import { Product, ProductStatus } from '../models/product.model';
 export class ProductService {
   private readonly STORAGE_KEY = 'produits';
   private readonly CATEGORIES_STORAGE_KEY = 'categories';
-  private productsSubject = new BehaviorSubject<Product[]>([]);
+  private productsSubject = new BehaviorSubject<Produit[]>([]);
   private categoriesSubject = new BehaviorSubject<Category[]>([]);
   public products$ = this.productsSubject.asObservable();
   public categories$ = this.categoriesSubject.asObservable();
@@ -20,20 +42,29 @@ export class ProductService {
   }
 
   // Récupérer tous les produits depuis localStorage
-  getProducts(): Observable<Product[]> {
+  getProducts(): Observable<Produit[]> {
     return this.products$;
   }
 
+  // Récupérer les produits d'un vendeur spécifique
+  getProductsByVendeur(vendeurId?: number): Observable<Produit[]> {
+    const currentProducts = this.productsSubject.value;
+    const vendeurProducts = vendeurId
+      ? currentProducts.filter(product => product.vendeurId === vendeurId)
+      : currentProducts;
+    return of(vendeurProducts);
+  }
+
   // Ajouter un produit dans localStorage
-  addProduct(product: Product): Observable<Product> {
+  addProduct(product: Produit): Observable<Produit> {
     const currentProducts = this.productsSubject.value;
 
     // Générer un nouvel ID basé sur le timestamp
-    const newProduct: Product = {
+    const newProduct: Produit = {
       ...product,
       id: Date.now(),
-      createdAt: new Date(),
-      updatedAt: new Date()
+      statut: 'pending',
+      dateAjout: new Date().toISOString()
     };
 
     const updatedProducts = [...currentProducts, newProduct];
@@ -43,8 +74,44 @@ export class ProductService {
     return of(newProduct);
   }
 
+  // Mettre à jour le statut d'un produit
+  updateProductStatus(id: number, statut: Produit['statut']): Observable<Produit | null> {
+    const currentProducts = this.productsSubject.value;
+    const productIndex = currentProducts.findIndex(product => product.id === id);
+
+    if (productIndex === -1) {
+      return of(null);
+    }
+
+    const updatedProducts = [...currentProducts];
+    updatedProducts[productIndex] = {
+      ...updatedProducts[productIndex],
+      statut
+    };
+
+    this.productsSubject.next(updatedProducts);
+    this.saveProductsToStorage(updatedProducts);
+
+    return of(updatedProducts[productIndex]);
+  }
+
+  // Supprimer un produit
+  deleteProduct(id: number): Observable<boolean> {
+    const currentProducts = this.productsSubject.value;
+    const updatedProducts = currentProducts.filter(product => product.id !== id);
+
+    if (updatedProducts.length === currentProducts.length) {
+      return of(false); // Produit non trouvé
+    }
+
+    this.productsSubject.next(updatedProducts);
+    this.saveProductsToStorage(updatedProducts);
+
+    return of(true);
+  }
+
   // Méthode privée pour sauvegarder dans localStorage
-  private saveProductsToStorage(products: Product[]): void {
+  private saveProductsToStorage(products: Produit[]): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(products));
     } catch (error) {
@@ -57,7 +124,7 @@ export class ProductService {
     try {
       const storedProducts = localStorage.getItem(this.STORAGE_KEY);
       if (storedProducts) {
-        const products = JSON.parse(storedProducts) as Product[];
+        const products = JSON.parse(storedProducts) as Produit[];
         this.productsSubject.next(products);
       }
     } catch (error) {
@@ -69,22 +136,6 @@ export class ProductService {
   // Récupérer les catégories depuis localStorage
   getCategories(): Observable<Category[]> {
     return this.categories$;
-  }
-
-  // Récupérer les produits d'un vendeur spécifique
-  getProductsBySeller(sellerId: number): Observable<Product[]> {
-    const currentProducts = this.productsSubject.value;
-    const sellerProducts = currentProducts.filter(product => product.sellerId === sellerId);
-    return of(sellerProducts);
-  }
-
-  // Supprimer un produit
-  deleteProduct(productId: number): Observable<void> {
-    const currentProducts = this.productsSubject.value;
-    const updatedProducts = currentProducts.filter(product => product.id !== productId);
-    this.productsSubject.next(updatedProducts);
-    this.saveProductsToStorage(updatedProducts);
-    return of(void 0);
   }
 
   // Méthode privée pour charger les catégories depuis localStorage

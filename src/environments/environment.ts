@@ -11,5 +11,9 @@ export const environment = {
   timeouts: {
     apiRequest: 30000,
     fileUpload: 60000
+  },
+  cloudinary: {
+    cloudName: 'dx9vm7abv',
+    uploadPreset: 'unsigned_preset'
   }
 };

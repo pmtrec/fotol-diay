@@ -2,9 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { ProductService } from '../../../core/services/product.service';
+import { ProductService, Produit } from '../../../core/services/product.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Product, ProductStatus } from '../../../core/models/product.model';
 
 @Component({
   selector: 'app-vendeur-dashboard',
@@ -25,7 +24,7 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
     lowStockProducts: 0
   };
 
-  recentProducts: Product[] = [];
+  recentProducts: Produit[] = [];
   currentUser: any;
 
   constructor(
@@ -46,34 +45,34 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
   private loadDashboardData(): void {
     if (this.currentUser) {
       // Charger les produits du vendeur
-      this.productService.getProductsBySeller(this.currentUser.id)
+      this.productService.getProductsByVendeur(this.currentUser.id)
         .pipe(takeUntil(this.destroy$))
-        .subscribe((products: Product[]) => {
+        .subscribe((products: Produit[]) => {
           this.dashboardStats = {
             totalProducts: products.length,
-            pendingProducts: products.filter(p => p.status === ProductStatus.PENDING).length,
-            approvedProducts: products.filter(p => p.status === ProductStatus.APPROVED).length,
-            rejectedProducts: products.filter(p => p.status === ProductStatus.REJECTED).length,
+            pendingProducts: products.filter(p => p.statut === 'pending').length,
+            approvedProducts: products.filter(p => p.statut === 'approved').length,
+            rejectedProducts: products.filter(p => p.statut === 'rejected').length,
             totalValue: this.calculateTotalValue(products),
             lowStockProducts: this.calculateLowStockProducts(products)
           };
 
           // Récupérer les 5 derniers produits
           this.recentProducts = products
-            .sort((a: Product, b: Product) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .sort((a: Produit, b: Produit) => new Date(b.dateAjout).getTime() - new Date(a.dateAjout).getTime())
             .slice(0, 5);
         });
     }
   }
 
-  private calculateTotalValue(products: Product[]): number {
+  private calculateTotalValue(products: Produit[]): number {
     return products
-      .filter(p => p.status === ProductStatus.APPROVED)
-      .reduce((total, product) => total + (product.price * product.stock), 0);
+      .filter(p => p.statut === 'approved')
+      .reduce((total, product) => total + (product.prix * product.stock), 0);
   }
 
-  private calculateLowStockProducts(products: Product[]): number {
-    return products.filter(p => p.stock <= 5 && p.status === ProductStatus.APPROVED).length;
+  private calculateLowStockProducts(products: Produit[]): number {
+    return products.filter(p => p.stock <= 5 && p.statut === 'approved').length;
   }
 
   navigateToAddProduct(): void {
@@ -86,20 +85,20 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
     console.log('Navigation vers la gestion des produits');
   }
 
-  getStatusLabel(status: ProductStatus): string {
-    switch (status) {
-      case ProductStatus.PENDING: return 'En Attente';
-      case ProductStatus.APPROVED: return 'Approuvé';
-      case ProductStatus.REJECTED: return 'Rejeté';
+  getStatusLabel(statut: string): string {
+    switch (statut) {
+      case 'pending': return 'En Attente';
+      case 'approved': return 'Approuvé';
+      case 'rejected': return 'Rejeté';
       default: return 'Inconnu';
     }
   }
 
-  getStatusClass(status: ProductStatus): string {
-    switch (status) {
-      case ProductStatus.PENDING: return 'pending';
-      case ProductStatus.APPROVED: return 'approved';
-      case ProductStatus.REJECTED: return 'rejected';
+  getStatusClass(statut: string): string {
+    switch (statut) {
+      case 'pending': return 'pending';
+      case 'approved': return 'approved';
+      case 'rejected': return 'rejected';
       default: return 'unknown';
     }
   }

@@ -102,14 +102,14 @@
    <div class="products-grid">
      <div class="product-card" *ngFor="let product of recentProducts">
        <div class="product-image">
-         <img [src]="product.images[0] || 'assets/images/no-image.png'" [alt]="product.name">
+         <img [src]="product.photoFlouDataUrl || 'assets/images/no-image.png'" [alt]="product.nom">
        </div>
        <div class="product-info">
-         <h4>{{product.name}}</h4>
-         <p class="product-price">{{product.price | currency:'XAF':'symbol':'1.0-0'}}</p>
+         <h4>{{product.nom}}</h4>
+         <p class="product-price">{{product.prix | currency:'XAF':'symbol':'1.0-0'}}</p>
          <p class="product-stock">Stock: {{product.stock}}</p>
-         <div class="product-status" [ngClass]="getStatusClass(product.status)">
-           <span>{{getStatusLabel(product.status)}}</span>
+         <div class="product-status" [ngClass]="getStatusClass(product.statut)">
+           <span>{{getStatusLabel(product.statut)}}</span>
          </div>
        </div>
        <div class="product-actions">

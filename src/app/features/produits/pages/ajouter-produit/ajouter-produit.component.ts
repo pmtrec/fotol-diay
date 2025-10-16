@@ -3,20 +3,20 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ProductService } from '../../../../core/services/product.service';
+import { HttpClientModule } from '@angular/common/http';
+import { ProductService, Produit } from '../../../../core/services/product.service';
 import { Category } from '../../../../core/models/category.model';
-import { Product } from '../../../../core/models/product.model';
+import { CloudinaryUploadService } from '../../../../core/services/cloudinary-upload.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-ajouter-produit',
   templateUrl: './ajouter-produit.component.html',
   styleUrls: ['./ajouter-produit.component.scss'],
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule]
 })
 export class AjouterProduitComponent implements OnInit, OnDestroy {
-  @ViewChild('videoElement', { static: false }) videoElement!: ElementRef<HTMLVideoElement>;
-  @ViewChild('canvasElement', { static: false }) canvasElement!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef<HTMLInputElement>;
 
   produitForm: FormGroup;
   isCameraOpen = false;
@@ -26,6 +26,10 @@ export class AjouterProduitComponent implements OnInit, OnDestroy {
   badgeCertifie = false;
   categories: Category[] = [];
   isSubmitting = false;
+  photoUrl: string = '';
+  previewUrl: string = '';
+  isUploading = false;
+  uploadError: string = '';
   private destroy$ = new Subject<void>();
 
   // Liste temporaire de catégories (à remplacer par un service de catégories)
@@ -45,6 +49,7 @@ export class AjouterProduitComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
+    private cloudinaryUploadService: CloudinaryUploadService,
     private router: Router
   ) {
     this.produitForm = this.fb.group({
@@ -58,13 +63,11 @@ export class AjouterProduitComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCategories();
-    this.loadPhotosFromStorage();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.stopCamera();
   }
 
   private loadCategories(): void {
@@ -78,128 +81,67 @@ export class AjouterProduitComponent implements OnInit, OnDestroy {
     }));
   }
 
-  // Gestion de la caméra
-  async startCamera(): Promise<void> {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480 }
+  // Gestion de l'upload d'image
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadImage(file);
+    }
+  }
+
+  private uploadImage(file: File): void {
+    // Validation du fichier
+    if (!this.cloudinaryUploadService.isValidImageFile(file)) {
+      this.uploadError = 'Fichier image invalide ou trop volumineux (max 10MB)';
+      return;
+    }
+
+    this.isUploading = true;
+    this.uploadError = '';
+
+    // Créer l'URL de prévisualisation
+    this.previewUrl = URL.createObjectURL(file);
+
+    this.cloudinaryUploadService.uploadImage(file)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result) => {
+          this.photoUrl = result.secure_url;
+          this.isUploading = false;
+          console.log('Image uploadée avec succès:', result.secure_url);
+        },
+        error: (error) => {
+          this.isUploading = false;
+          this.uploadError = error.message || 'Erreur lors de l\'upload de l\'image';
+          console.error('Erreur lors de l\'upload:', error);
+        }
       });
-
-      if (this.videoElement) {
-        this.videoElement.nativeElement.srcObject = stream;
-        this.isCameraOpen = true;
-        this.isStreaming = true;
-      }
-    } catch (error) {
-      console.error('Erreur lors de l\'accès à la caméra:', error);
-      alert('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
-    }
   }
 
-  stopCamera(): void {
-    if (this.videoElement?.nativeElement?.srcObject) {
-      const stream = this.videoElement.nativeElement.srcObject as MediaStream;
-      const tracks = stream.getTracks();
-      tracks.forEach(track => track.stop());
-      this.videoElement.nativeElement.srcObject = null;
-    }
-    this.isCameraOpen = false;
-    this.isStreaming = false;
-  }
-
-  capturePhoto(): void {
-    if (!this.videoElement || !this.canvasElement) return;
-
-    const video = this.videoElement.nativeElement;
-    const canvas = this.canvasElement.nativeElement;
-    const context = canvas.getContext('2d');
-
-    if (context) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0);
-
-      this.capturedPhoto = canvas.toDataURL('image/jpeg', 0.8);
-      this.generateBlurredPhoto();
-      this.badgeCertifie = true;
-      this.savePhotosToStorage();
-      this.stopCamera();
-    }
-  }
-
-  private generateBlurredPhoto(): void {
-    if (!this.capturedPhoto || !this.canvasElement) return;
-
-    const canvas = this.canvasElement.nativeElement;
-    const context = canvas.getContext('2d');
-
-    if (context) {
-      const img = new Image();
-      img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        // Appliquer un flou à l'image
-        context.filter = 'blur(4px)';
-        context.drawImage(img, 0, 0);
-
-        this.blurredPhoto = canvas.toDataURL('image/jpeg', 0.6);
-        this.savePhotosToStorage();
-      };
-      img.src = this.capturedPhoto;
-    }
-  }
-
-  private savePhotosToStorage(): void {
-    if (this.capturedPhoto || this.blurredPhoto) {
-      const photoData = {
-        original: this.capturedPhoto,
-        blurred: this.blurredPhoto,
-        timestamp: new Date().toISOString(),
-        badgeCertifie: this.badgeCertifie
-      };
-
-      try {
-        localStorage.setItem('product_photos', JSON.stringify(photoData));
-      } catch (error) {
-        console.error('Erreur lors de la sauvegarde dans localStorage:', error);
-      }
-    }
-  }
-
-  private loadPhotosFromStorage(): void {
-    try {
-      const savedData = localStorage.getItem('product_photos');
-      if (savedData) {
-        const photoData = JSON.parse(savedData);
-        this.capturedPhoto = photoData.original || null;
-        this.blurredPhoto = photoData.blurred || null;
-        this.badgeCertifie = photoData.badgeCertifie || false;
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement depuis localStorage:', error);
-    }
+  removeImage(): void {
+    this.photoUrl = '';
+    this.previewUrl = '';
+    this.uploadError = '';
   }
 
   onSubmit(): void {
-    if (this.produitForm.valid && this.capturedPhoto) {
+    if (this.produitForm.valid && this.photoUrl) {
       // Set loading state to true
       this.isSubmitting = true;
 
       const formValue = this.produitForm.value;
 
-      const newProduct: Product = {
+      const newProduct: Produit = {
         id: Date.now(),
-        name: formValue.nom,
+        nom: formValue.nom,
         description: formValue.description,
-        price: formValue.prix,
+        prix: formValue.prix,
         stock: formValue.stock,
-        category: formValue.categorie,
-        images: this.capturedPhoto ? [this.capturedPhoto] : [],
-        status: 'pending' as any,
-        sellerId: 1, // TODO: Get from auth service
-        createdAt: new Date(),
-        updatedAt: new Date()
+        categorie: formValue.categorie,
+        imageUrl: this.photoUrl || '',
+        vendeurId: 1, // TODO: Get from auth service
+        statut: 'pending' as const,
+        dateAjout: new Date().toISOString()
       };
 
       this.productService.addProduct(newProduct)
@@ -221,8 +163,8 @@ export class AjouterProduitComponent implements OnInit, OnDestroy {
         });
     } else {
       this.markFormGroupTouched();
-      if (!this.capturedPhoto) {
-        alert('Veuillez capturer une photo du produit.');
+      if (!this.photoUrl) {
+        alert('Veuillez sélectionner une photo du produit.');
       }
     }
   }

@@ -2,9 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { ProductService } from '../../../core/services/product.service';
+import { ProductService, Produit } from '../../../core/services/product.service';
 import { UserService } from '../../../core/services/user.service';
-import { Product, ProductStatus } from '../../../core/models/product.model';
 
 @Component({
   selector: 'app-vendeur-dashboard',
@@ -17,10 +16,10 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   // Products and filtering
-  products: Product[] = [];
-  filteredProducts: Product[] = [];
+  products: Produit[] = [];
+  filteredProducts: Produit[] = [];
   isLoading = false;
-  currentFilter: 'all' | 'pending' | 'approved' | 'rejected' = 'pending'; // Default to pending (non-approved)
+  currentFilter: 'all' | 'pending' | 'approved' | 'rejected' = 'all'; // Default to show all products
 
   // Current seller ID (mock for now, should come from user service)
   currentSellerId = 1; // TODO: Get from UserService when implemented
@@ -53,7 +52,7 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     // Get products by seller
-    this.productService.getProductsBySeller(this.currentSellerId)
+    this.productService.getProductsByVendeur(this.currentSellerId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (products) => {
@@ -72,13 +71,13 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
   private applyFilter(): void {
     switch (this.currentFilter) {
       case 'pending':
-        this.filteredProducts = this.products.filter(p => p.status === ProductStatus.PENDING);
+        this.filteredProducts = this.products.filter(p => p.statut === 'pending');
         break;
       case 'approved':
-        this.filteredProducts = this.products.filter(p => p.status === ProductStatus.APPROVED);
+        this.filteredProducts = this.products.filter(p => p.statut === 'approved');
         break;
       case 'rejected':
-        this.filteredProducts = this.products.filter(p => p.status === ProductStatus.REJECTED);
+        this.filteredProducts = this.products.filter(p => p.statut === 'rejected');
         break;
       default:
         this.filteredProducts = this.products;
@@ -107,13 +106,13 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
   }
 
   // Get status label in French
-  getStatusLabel(status: ProductStatus): string {
-    switch (status) {
-      case ProductStatus.PENDING:
+  getStatusLabel(statut: string): string {
+    switch (statut) {
+      case 'pending':
         return 'En attente';
-      case ProductStatus.APPROVED:
+      case 'approved':
         return 'Approuvé';
-      case ProductStatus.REJECTED:
+      case 'rejected':
         return 'Rejeté';
       default:
         return 'Inconnu';
@@ -121,13 +120,13 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
   }
 
   // Get status CSS class
-  getStatusClass(status: ProductStatus): string {
-    switch (status) {
-      case ProductStatus.PENDING:
+  getStatusClass(statut: string): string {
+    switch (statut) {
+      case 'pending':
         return 'status-pending';
-      case ProductStatus.APPROVED:
+      case 'approved':
         return 'status-approved';
-      case ProductStatus.REJECTED:
+      case 'rejected':
         return 'status-rejected';
       default:
         return '';
@@ -136,15 +135,15 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
 
   // Get product counts for each status
   getPendingCount(): number {
-    return this.products.filter(p => p.status === ProductStatus.PENDING).length;
+    return this.products.filter(p => p.statut === 'pending').length;
   }
 
   getApprovedCount(): number {
-    return this.products.filter(p => p.status === ProductStatus.APPROVED).length;
+    return this.products.filter(p => p.statut === 'approved').length;
   }
 
   getRejectedCount(): number {
-    return this.products.filter(p => p.status === ProductStatus.REJECTED).length;
+    return this.products.filter(p => p.statut === 'rejected').length;
   }
 
   // Product management methods

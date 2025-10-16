@@ -1,0 +1,97 @@
+<div class="mes-produits">
+  <div class="page-header">
+    <h1>Mes Produits</h1>
+    <p>Gérez vos produits soumis et approuvés</p>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading">
+    <p>Chargement de vos produits...</p>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && produits.length === 0" class="empty-state">
+    <div class="empty-content">
+      <h2>Aucun produit trouvé</h2>
+      <p>Vous n'avez pas encore ajouté de produits.</p>
+      <button type="button" class="btn btn-primary" (click)="navigateToAddProduct()">
+        Ajouter mon premier produit
+      </button>
+    </div>
+  </div>
+
+  <!-- Products grid -->
+  <div *ngIf="!isLoading && produits.length > 0" class="products-grid">
+    <div class="product-card" *ngFor="let produit of produits">
+      <div class="product-image">
+        <img [src]="produit.imageUrl" [alt]="produit.nom" class="product-image-preview">
+        <div class="image-overlay">
+          <button
+            type="button"
+            class="btn-view-real"
+            (click)="openRealPhotoModal(produit)"
+            title="Voir la photo en taille réelle">
+            Voir en grand
+          </button>
+        </div>
+      </div>
+
+      <div class="product-info">
+        <h3 class="product-name">{{ produit.nom }}</h3>
+        <p class="product-category">{{ produit.categorie }}</p>
+        <p class="product-description">{{ produit.description }}</p>
+
+        <div class="product-details">
+          <div class="detail-item">
+            <span class="label">Prix:</span>
+            <span class="value">{{ produit.prix | currency:'XAF':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Stock:</span>
+            <span class="value">{{ produit.stock }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Date:</span>
+            <span class="value">{{ formatDate(produit.dateAjout) }}</span>
+          </div>
+        </div>
+
+        <div class="product-status">
+          <span class="badge" [ngClass]="getBadgeClass(produit.statut)">
+            <i class="fas" [ngClass]="{
+              'fa-clock': produit.statut === 'pending',
+              'fa-check': produit.statut === 'approved'
+            }"></i>
+            {{ getBadgeText(produit.statut) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real photo modal -->
+  <div *ngIf="showRealPhotoModal" class="modal-overlay" (click)="closeRealPhotoModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedProductForModal?.nom }}</h2>
+        <button type="button" class="btn-close" (click)="closeRealPhotoModal()">
+          ×
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <img
+          *ngIf="selectedProductForModal"
+          [src]="selectedProductForModal.imageUrl"
+          [alt]="selectedProductForModal.nom"
+          class="real-photo">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeRealPhotoModal()">
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

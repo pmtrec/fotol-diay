@@ -29,35 +29,69 @@ export class ImageUploadService {
    */
   uploadImage(file: File, userId?: number): Observable<string> {
     return new Observable((observer) => {
-      // Simulation de l'upload d'image
+      // Validate file first
+      if (!this.isValidImageFile(file)) {
+        observer.error(new Error('Fichier image invalide ou trop volumineux'));
+        return;
+      }
+
+      // Convert file to base64 for upload
       const reader = new FileReader();
 
       reader.onload = (e) => {
-        // Générer une URL fictive pour l'image
-        const imageUrl = this.generateImageUrl(file.name, file.size);
+        try {
+          const base64String = (e.target?.result as string).split(',')[1];
 
-        // Créer l'objet image uploadée
-        const uploadedImage: UploadedImage = {
-          id: Date.now(), // ID temporaire basé sur le timestamp
-          filename: this.generateFilename(file.name),
-          originalName: file.name,
-          url: imageUrl,
-          size: file.size,
-          mimeType: file.type,
-          uploadedAt: new Date().toISOString(),
-          uploadedBy: userId
-        };
+          // Create upload data
+          const uploadData = {
+            file: base64String,
+            filename: this.generateFilename(file.name),
+            originalName: file.name,
+            mimeType: file.type,
+            size: file.size,
+            uploadedBy: userId
+          };
 
-        // Sauvegarder dans le serveur JSON (simulation)
-        this.saveUploadedImage(uploadedImage).subscribe({
-          next: () => {
-            observer.next(imageUrl);
-            observer.complete();
-          },
-          error: (error) => {
-            observer.error(error);
-          }
-        });
+          // Upload to local backend server
+          this.apiService.post<{url: string}>(`${this.baseUrl}/uploads`, uploadData).subscribe({
+            next: (response) => {
+              if (response && response.url) {
+                // Créer l'objet image uploadée pour la sauvegarde locale
+                const uploadedImage: UploadedImage = {
+                  id: Date.now(), // ID temporaire basé sur le timestamp
+                  filename: uploadData.filename,
+                  originalName: file.name,
+                  url: response.url,
+                  size: file.size,
+                  mimeType: file.type,
+                  uploadedAt: new Date().toISOString(),
+                  uploadedBy: userId
+                };
+
+                // Sauvegarder dans le serveur JSON pour le suivi
+                this.saveUploadedImage(uploadedImage).subscribe({
+                  next: () => {
+                    observer.next(response.url);
+                    observer.complete();
+                  },
+                  error: (error) => {
+                    // L'upload a réussi mais la sauvegarde locale a échoué
+                    console.warn('Image uploaded but failed to save locally:', error);
+                    observer.next(response.url);
+                    observer.complete();
+                  }
+                });
+              } else {
+                observer.error(new Error('Réponse invalide du serveur'));
+              }
+            },
+            error: (error) => {
+              observer.error(new Error(`Erreur lors de l'upload: ${error.message || error}`));
+            }
+          });
+        } catch (error) {
+          observer.error(new Error(`Erreur lors du traitement du fichier: ${error}`));
+        }
       };
 
       reader.onerror = () => {
@@ -180,34 +214,30 @@ export class ImageUploadService {
    * @returns Promise<MediaStream> Le flux vidéo de la caméra
    */
   async openCamera(): Promise<MediaStream> {
-    return new Promise((resolve, reject) => {
-      // Vérifier si la caméra est disponible
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        reject(new Error('Caméra non disponible sur ce navigateur'));
-        return;
-      }
+    // Vérifier si la caméra est disponible
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error('Caméra non disponible sur ce navigateur');
+    }
 
+    try {
       // Demander l'accès à la caméra
-      navigator.mediaDevices.getUserMedia({
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment', // Utiliser la caméra arrière par défaut
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
-      })
-      .then(stream => {
-        resolve(stream);
-      })
-      .catch(error => {
-        if (error.name === 'NotAllowedError') {
-          reject(new Error('Accès à la caméra refusé. Veuillez autoriser l\'accès à la caméra.'));
-        } else if (error.name === 'NotFoundError') {
-          reject(new Error('Aucune caméra trouvée sur cet appareil'));
-        } else {
-          reject(new Error(`Erreur d'accès à la caméra: ${error.message}`));
-        }
       });
-    });
+      return stream;
+    } catch (error: any) {
+      if (error.name === 'NotAllowedError') {
+        throw new Error('Accès à la caméra refusé. Veuillez autoriser l\'accès à la caméra.');
+      } else if (error.name === 'NotFoundError') {
+        throw new Error('Aucune caméra trouvée sur cet appareil');
+      } else {
+        throw new Error(`Erreur d'accès à la caméra: ${error.message}`);
+      }
+    }
   }
 
   /**
