@@ -120,10 +120,13 @@ export class AddProductComponent implements OnInit, OnDestroy {
 
       const formValue = this.productForm.value;
       const newProduct = {
-        ...formValue,
-        images: this.selectedImages,
+        name: formValue.name,
+        description: formValue.description,
+        price: formValue.price,
+        category: formValue.category,
+        stock: formValue.stock,
         sellerId: currentUser.id,
-        status: ProductStatus.PENDING
+        images: this.selectedImages
       };
 
       this.productService.addProduct(newProduct)
@@ -131,7 +134,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (product) => {
             alert('Produit ajouté avec succès ! Il sera visible après validation par l\'administrateur.');
-            this.router.navigate(['/vendeur/products']);
+            this.router.navigate(['/vendeur/mes-produits']);
           },
           error: (error) => {
             console.error('Erreur lors de l\'ajout du produit:', error);

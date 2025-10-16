@@ -1,0 +1,214 @@
+<div class="clients-management">
+  <div class="header">
+    <h1>Gestion des Clients</h1>
+    <p class="subtitle">Gérez les clients de votre plateforme</p>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fa-solid fa-search"></i>
+      <input
+        type="text"
+        placeholder="Rechercher par nom, email ou nom d'utilisateur..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()">
+    </div>
+
+    <div class="filter-controls">
+      <select [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+        <option value="all">Tous les statuts</option>
+        <option value="active">Actifs</option>
+        <option value="inactive">Inactifs</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <p>Chargement des clients...</p>
+  </div>
+
+  <!-- Clients Table -->
+  <div *ngIf="!loading" class="clients-table-container">
+    <div class="table-responsive">
+      <table class="clients-table">
+        <thead>
+          <tr>
+            <th (click)="onSortChange('firstName')" class="sortable">
+              <span>Nom</span>
+              <i [class]="getSortIcon('firstName')"></i>
+            </th>
+            <th (click)="onSortChange('email')" class="sortable">
+              <span>Email</span>
+              <i [class]="getSortIcon('email')"></i>
+            </th>
+            <th (click)="onSortChange('username')" class="sortable">
+              <span>Nom d'utilisateur</span>
+              <i [class]="getSortIcon('username')"></i>
+            </th>
+            <th>Téléphone</th>
+            <th (click)="onSortChange('isActive')" class="sortable">
+              <span>Statut</span>
+              <i [class]="getSortIcon('isActive')"></i>
+            </th>
+            <th (click)="onSortChange('createdAt')" class="sortable">
+              <span>Date d'inscription</span>
+              <i [class]="getSortIcon('createdAt')"></i>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let client of filteredClients" class="client-row">
+            <td class="client-name">
+              {{ client.firstName }} {{ client.lastName }}
+            </td>
+            <td class="client-email">{{ client.email }}</td>
+            <td class="client-username">{{ client.username }}</td>
+            <td class="client-phone">{{ client.phone || '-' }}</td>
+            <td class="client-status">
+              <span [class]="'status-badge ' + getStatusClass(client.isActive)">
+                {{ getStatusText(client.isActive) }}
+              </span>
+            </td>
+            <td class="client-date">
+              {{ client.createdAt | date:'dd/MM/yyyy' }}
+            </td>
+            <td class="client-actions">
+              <button
+                class="btn btn-view"
+                (click)="viewClient(client)"
+                title="Voir les détails">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button
+                class="btn btn-toggle"
+                (click)="toggleClientStatus(client)"
+                [title]="client.isActive ? 'Désactiver' : 'Activer'">
+                <i [class]="client.isActive ? 'fa-solid fa-ban' : 'fa-solid fa-check'"></i>
+              </button>
+              <button
+                class="btn btn-delete"
+                (click)="deleteClient(client)"
+                title="Supprimer">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredClients.length === 0" class="empty-state">
+      <i class="fa-solid fa-users"></i>
+      <h3>Aucun client trouvé</h3>
+      <p *ngIf="searchTerm || statusFilter !== 'all'">
+        Aucun client ne correspond à vos critères de recherche.
+      </p>
+      <p *ngIf="!searchTerm && statusFilter === 'all'">
+        Aucun client n'est enregistré dans le système.
+      </p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && filteredClients.length > 0" class="pagination">
+    <div class="pagination-info">
+      <span>Affichage de {{ ((currentPage - 1) * itemsPerPage) + 1 }} à
+        {{ getCurrentPageEnd() }} sur {{ totalItems }} clients</span>
+    </div>
+    <div class="pagination-controls">
+      <button
+        class="btn btn-pagination"
+        [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)">
+        <i class="fa-solid fa-chevron-left"></i>
+        Précédent
+      </button>
+
+      <div class="page-numbers">
+        <button
+          *ngFor="let page of getPaginationArray()"
+          class="btn btn-pagination"
+          [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
+          {{ page }}
+        </button>
+      </div>
+
+      <button
+        class="btn btn-pagination"
+        [disabled]="currentPage === getPaginationArray().length"
+        (click)="onPageChange(currentPage + 1)">
+        Suivant
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Client Details Modal -->
+<div *ngIf="showClientModal" class="modal-overlay" (click)="closeClientModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Détails du Client</h2>
+      <button class="btn btn-close" (click)="closeClientModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <div *ngIf="selectedClient" class="modal-body">
+      <div class="client-details">
+        <div class="detail-section">
+          <h3>Informations Personnelles</h3>
+          <div class="detail-row">
+            <label>Nom complet:</label>
+            <span>{{ selectedClient.firstName }} {{ selectedClient.lastName }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Email:</label>
+            <span>{{ selectedClient.email }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Nom d'utilisateur:</label>
+            <span>{{ selectedClient.username }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Téléphone:</label>
+            <span>{{ selectedClient.phone || 'Non renseigné' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Informations Compte</h3>
+          <div class="detail-row">
+            <label>Statut:</label>
+            <span [class]="'status-badge ' + getStatusClass(selectedClient.isActive)">
+              {{ getStatusText(selectedClient.isActive) }}
+            </span>
+          </div>
+          <div class="detail-row">
+            <label>Date d'inscription:</label>
+            <span>{{ selectedClient.createdAt | date:'dd/MM/yyyy à HH:mm' }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Dernière mise à jour:</label>
+            <span>{{ selectedClient.updatedAt | date:'dd/MM/yyyy à HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeClientModal()">
+        Fermer
+      </button>
+      <button class="btn btn-primary" (click)="toggleClientStatus(selectedClient!)">
+        {{ selectedClient?.isActive ? 'Désactiver' : 'Activer' }} le Compte
+      </button>
+    </div>
+  </div>
+</div>

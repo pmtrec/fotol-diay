@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { ApiService } from './api.service';
+import { UserRole } from '../models/user.model';
 
 // Interfaces pour les données admin
 export interface AdminStats {
@@ -37,6 +38,21 @@ export interface SystemAlert {
   title: string;
   message: string;
   time: string;
+}
+
+export interface ClientFilters {
+  search?: string;
+  isActive?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+export interface ClientStats {
+  totalClients: number;
+  activeClients: number;
+  inactiveClients: number;
+  newClientsThisMonth: number;
+  clientGrowth: number;
 }
 
 @Injectable({
@@ -309,6 +325,39 @@ export class AdminService {
 
   exportData(type: 'users' | 'products' | 'orders', format: 'csv' | 'excel' = 'csv'): Observable<Blob> {
     return this.apiService.get(`${this.baseUrl}/export/${type}?format=${format}`)
+      .pipe(map(response => new Blob([response as any])));
+  }
+
+  // 👥 Client-specific methods
+  getClients(page: number = 1, limit: number = 10, filters?: ClientFilters): Observable<any> {
+    let params = `?page=${page}&limit=${limit}&role=${UserRole.CUSTOMER}`;
+    if (filters) {
+      if (filters.isActive !== undefined) params += `&isActive=${filters.isActive}`;
+      if (filters.search) params += `&search=${encodeURIComponent(filters.search)}`;
+      if (filters.dateFrom) params += `&dateFrom=${filters.dateFrom}`;
+      if (filters.dateTo) params += `&dateTo=${filters.dateTo}`;
+    }
+    return this.apiService.get(`${this.baseUrl}/clients${params}`);
+  }
+
+  getClientById(id: string): Observable<any> {
+    return this.apiService.get(`${this.baseUrl}/clients/${id}`);
+  }
+
+  getClientStats(): Observable<ClientStats> {
+    return this.apiService.get(`${this.baseUrl}/clients/stats`);
+  }
+
+  updateClientStatus(clientId: string, isActive: boolean): Observable<any> {
+    return this.apiService.patch(`${this.baseUrl}/clients/${clientId}/status`, { isActive });
+  }
+
+  bulkUpdateClients(clientIds: string[], action: 'activate' | 'deactivate' | 'delete'): Observable<any> {
+    return this.apiService.post(`${this.baseUrl}/clients/bulk`, { clientIds, action });
+  }
+
+  exportClients(format: 'csv' | 'excel' = 'csv'): Observable<Blob> {
+    return this.apiService.get(`${this.baseUrl}/clients/export?format=${format}`)
       .pipe(map(response => new Blob([response as any])));
   }
 }

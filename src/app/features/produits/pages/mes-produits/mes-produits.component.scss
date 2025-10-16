@@ -22,6 +22,39 @@
     }
   }
 
+  .filter-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+
+    .filter-tab {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      color: #64748b;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+
+      &:hover {
+        border-color: #0066cc;
+        color: #0066cc;
+        background: #f8faff;
+      }
+
+      &.active {
+        background: #0066cc;
+        border-color: #0066cc;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
+      }
+    }
+  }
+
   .loading {
     text-align: center;
     padding: 48px;

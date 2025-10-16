@@ -22,7 +22,7 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
   currentFilter: 'all' | 'pending' | 'approved' | 'rejected' = 'all'; // Default to show all products
 
   // Current seller ID (mock for now, should come from user service)
-  currentSellerId = 1; // TODO: Get from UserService when implemented
+  currentSellerId = 2; // TODO: Get from UserService when implemented
 
   constructor(
     private router: Router,
@@ -71,13 +71,13 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
   private applyFilter(): void {
     switch (this.currentFilter) {
       case 'pending':
-        this.filteredProducts = this.products.filter(p => p.statut === 'pending');
+        this.filteredProducts = this.products.filter(p => p.status === 'pending');
         break;
       case 'approved':
-        this.filteredProducts = this.products.filter(p => p.statut === 'approved');
+        this.filteredProducts = this.products.filter(p => p.status === 'approved');
         break;
       case 'rejected':
-        this.filteredProducts = this.products.filter(p => p.statut === 'rejected');
+        this.filteredProducts = this.products.filter(p => p.status === 'rejected');
         break;
       default:
         this.filteredProducts = this.products;
@@ -135,25 +135,34 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
 
   // Get product counts for each status
   getPendingCount(): number {
-    return this.products.filter(p => p.statut === 'pending').length;
+    return this.products.filter(p => p.status === 'pending').length;
   }
 
   getApprovedCount(): number {
-    return this.products.filter(p => p.statut === 'approved').length;
+    return this.products.filter(p => p.status === 'approved').length;
   }
 
   getRejectedCount(): number {
-    return this.products.filter(p => p.statut === 'rejected').length;
+    return this.products.filter(p => p.status === 'rejected').length;
   }
 
   // Product management methods
-  editProduct(productId: number): void {
+  editProduct(productId: number | undefined): void {
+    if (productId === undefined) {
+      console.error('Erreur: ID du produit manquant');
+      return;
+    }
     this.router.navigate(['/vendeur/edit-product', productId]);
   }
 
-  deleteProduct(productId: number): void {
+  deleteProduct(productId: number | undefined): void {
+    if (productId === undefined) {
+      console.error('Erreur: ID du produit manquant');
+      return;
+    }
+
     if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-      this.productService.deleteProduct(productId)
+      this.productService.deleteProduct(productId.toString())
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {

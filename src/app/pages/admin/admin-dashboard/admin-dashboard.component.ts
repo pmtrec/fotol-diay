@@ -50,16 +50,16 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
         .subscribe((products: Produit[]) => {
           this.dashboardStats = {
             totalProducts: products.length,
-            pendingProducts: products.filter(p => p.statut === 'pending').length,
-            approvedProducts: products.filter(p => p.statut === 'approved').length,
-            rejectedProducts: products.filter(p => p.statut === 'rejected').length,
+            pendingProducts: products.filter(p => p.status === 'pending').length,
+            approvedProducts: products.filter(p => p.status === 'approved').length,
+            rejectedProducts: products.filter(p => p.status === 'rejected').length,
             totalValue: this.calculateTotalValue(products),
             lowStockProducts: this.calculateLowStockProducts(products)
           };
 
           // Récupérer les 5 derniers produits
           this.recentProducts = products
-            .sort((a: Produit, b: Produit) => new Date(b.dateAjout).getTime() - new Date(a.dateAjout).getTime())
+            .sort((a: Produit, b: Produit) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime())
             .slice(0, 5);
         });
     }
@@ -67,12 +67,12 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
 
   private calculateTotalValue(products: Produit[]): number {
     return products
-      .filter(p => p.statut === 'approved')
-      .reduce((total, product) => total + (product.prix * product.stock), 0);
+      .filter(p => p.status === 'approved')
+      .reduce((total, product) => total + (product.price * product.stock), 0);
   }
 
   private calculateLowStockProducts(products: Produit[]): number {
-    return products.filter(p => p.stock <= 5 && p.statut === 'approved').length;
+    return products.filter(p => p.stock <= 5 && p.status === 'approved').length;
   }
 
   navigateToAddProduct(): void {

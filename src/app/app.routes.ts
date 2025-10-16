@@ -102,6 +102,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
       },
       {
+        path: 'clients',
+        loadComponent: () => import('./pages/admin/clients-management/clients-management.component').then(m => m.ClientsManagementComponent)
+      },
+      {
         path: 'product-validation',
         loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
       },

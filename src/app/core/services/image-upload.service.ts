@@ -35,58 +35,40 @@ export class ImageUploadService {
         return;
       }
 
-      // Convert file to base64 for upload
+      // Convert file to base64 for processing
       const reader = new FileReader();
 
       reader.onload = (e) => {
         try {
-          const base64String = (e.target?.result as string).split(',')[1];
+          const base64Data = e.target?.result as string;
 
-          // Create upload data
-          const uploadData = {
-            file: base64String,
+          // Create a blob URL for the actual image data
+          const blob = new Blob([file], { type: file.type });
+          const imageUrl = URL.createObjectURL(blob);
+
+          // Créer l'objet image uploadée pour la sauvegarde locale
+          const uploadedImage: UploadedImage = {
+            id: Date.now(), // ID temporaire basé sur le timestamp
             filename: this.generateFilename(file.name),
             originalName: file.name,
-            mimeType: file.type,
+            url: imageUrl,
             size: file.size,
+            mimeType: file.type,
+            uploadedAt: new Date().toISOString(),
             uploadedBy: userId
           };
 
-          // Upload to local backend server
-          this.apiService.post<{url: string}>(`${this.baseUrl}/uploads`, uploadData).subscribe({
-            next: (response) => {
-              if (response && response.url) {
-                // Créer l'objet image uploadée pour la sauvegarde locale
-                const uploadedImage: UploadedImage = {
-                  id: Date.now(), // ID temporaire basé sur le timestamp
-                  filename: uploadData.filename,
-                  originalName: file.name,
-                  url: response.url,
-                  size: file.size,
-                  mimeType: file.type,
-                  uploadedAt: new Date().toISOString(),
-                  uploadedBy: userId
-                };
-
-                // Sauvegarder dans le serveur JSON pour le suivi
-                this.saveUploadedImage(uploadedImage).subscribe({
-                  next: () => {
-                    observer.next(response.url);
-                    observer.complete();
-                  },
-                  error: (error) => {
-                    // L'upload a réussi mais la sauvegarde locale a échoué
-                    console.warn('Image uploaded but failed to save locally:', error);
-                    observer.next(response.url);
-                    observer.complete();
-                  }
-                });
-              } else {
-                observer.error(new Error('Réponse invalide du serveur'));
-              }
+          // Sauvegarder dans le serveur JSON pour le suivi
+          this.saveUploadedImage(uploadedImage).subscribe({
+            next: () => {
+              observer.next(imageUrl);
+              observer.complete();
             },
             error: (error) => {
-              observer.error(new Error(`Erreur lors de l'upload: ${error.message || error}`));
+              // L'upload a réussi mais la sauvegarde locale a échoué
+              console.warn('Image uploaded but failed to save locally:', error);
+              observer.next(imageUrl);
+              observer.complete();
             }
           });
         } catch (error) {
@@ -98,7 +80,7 @@ export class ImageUploadService {
         observer.error(new Error('Erreur lors de la lecture du fichier'));
       };
 
-      reader.readAsDataURL(file);
+      reader.readAsArrayBuffer(file);
     });
   }
 
@@ -241,11 +223,11 @@ export class ImageUploadService {
   }
 
   /**
-   * Capturer une photo depuis un flux vidéo
-   * @param videoElement L'élément vidéo source
-   * @param userId L'ID de l'utilisateur qui capture (optionnel)
-   * @returns Promise<string> L'URL de l'image capturée
-   */
+    * Capturer une photo depuis un élément vidéo
+    * @param videoElement L'élément vidéo source
+    * @param userId L'ID de l'utilisateur qui capture (optionnel)
+    * @returns Promise<string> L'URL de l'image capturée
+    */
   async captureFromVideoElement(videoElement: HTMLVideoElement, userId?: number): Promise<string> {
     return new Promise((resolve, reject) => {
       try {
@@ -279,10 +261,20 @@ export class ImageUploadService {
             lastModified: timestamp
           });
 
-          // Utiliser la méthode d'upload existante
-          this.uploadImage(file, userId).subscribe({
-            next: (imageUrl) => resolve(imageUrl),
-            error: (error) => reject(error)
+          // Convertir l'Observable en Promise et gérer le résultat
+          this.uploadImage(file, userId).toPromise().then(
+            (imageUrl) => {
+              if (imageUrl) {
+                resolve(imageUrl);
+              } else {
+                reject(new Error('URL de l\'image non reçue'));
+              }
+            },
+            (error) => {
+              reject(error);
+            }
+          ).catch((error) => {
+            reject(new Error(`Erreur lors de la capture: ${error.message || error}`));
           });
         }, 'image/jpeg', 0.9);
       } catch (error) {

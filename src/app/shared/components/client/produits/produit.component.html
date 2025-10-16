@@ -1,29 +1,79 @@
 <div class="produits-container">
-  <h2 class="section-title">Produits populaires</h2>
+ <div class="header-section">
+   <h2 class="section-title">Découvrez nos produits</h2>
+   <p class="section-subtitle">Trouvez les meilleurs produits de nos vendeurs partenaires</p>
+ </div>
 
-  <div class="produits-grid">
-    <div class="produit-card" *ngFor="let p of produits">
-      <div class="image-container">
-        <img [src]="p.imageUrl" [alt]="p.nom" />
-        <div *ngIf="p.verified" class="badge-verified">✔ certifié</div>
-      </div>
+ <div class="loading-state" *ngIf="isLoading">
+   <div class="loading-spinner">
+     <i class="fa-solid fa-spinner fa-spin"></i>
+     <p>Chargement des produits...</p>
+   </div>
+ </div>
 
-      <div class="produit-info">
-        <h3 class="produit-nom">{{ p.nom }}</h3>
-        <p class="produit-prix">{{ p.prix }}</p>
-        <p class="produit-quantite">Quantité min: {{ p.quantiteMin }}</p>
+ <div class="produits-grid" *ngIf="!isLoading">
+   <div class="produit-card" *ngFor="let p of produits" (click)="viewProduct(p)">
+     <div class="image-container">
+       <img
+         [src]="getMainImage(p.images || (p.images[0] ? [p.images[0]] : []))"
+         [alt]="p.name"
+         (error)="onImageError($event)"
+         loading="lazy"
+         class="product-image" />
+       <div class="image-overlay">
+         <div class="badge-approved" *ngIf="p.status === 'approved'">
+           <i class="fa-solid fa-check-circle"></i>
+           Approuvé
+         </div>
+         <div class="quick-view">
+           <i class="fa-solid fa-eye"></i>
+           Aperçu
+         </div>
+       </div>
+       <div class="stock-indicator" [class.low-stock]="p.stock < 10" [class.out-of-stock]="p.stock === 0">
+         <span *ngIf="p.stock === 0">Épuisé</span>
+         <span *ngIf="p.stock > 0 && p.stock < 10">{{ p.stock }} restant</span>
+         <span *ngIf="p.stock >= 10">En stock</span>
+       </div>
+     </div>
 
-        <div class="produit-fournisseur">
-          <img
-            *ngIf="p.pays"
-            [src]="'https://flagcdn.com/24x18/' + p.pays.toLowerCase() + '.png'"
-            [alt]="p.pays"
-          />
-          <span>{{ p.fournisseur }}</span>
-        </div>
+     <div class="produit-info">
+       <div class="category-tag">{{ p.category }}</div>
+       <h3 class="produit-nom">{{ p.name }}</h3>
+       <p class="produit-description">{{ p.description }}</p>
 
-        <button class="btn-contact">Contacter le fournisseur</button>
-      </div>
-    </div>
-  </div>
+       <div class="price-section">
+         <span class="current-price">{{ formatPrice(p.price) }}</span>
+         <span class="stock-info">{{ p.stock }} unités</span>
+       </div>
+
+       <div class="vendeur-info">
+         <div class="vendeur-avatar">
+           <i class="fa-solid fa-store"></i>
+         </div>
+         <span class="vendeur-name">Vendeur #{{ p.sellerId }}</span>
+       </div>
+
+       <div class="card-actions">
+         <button class="btn btn-primary" (click)="addToCart(p); $event.stopPropagation()">
+           <i class="fa-solid fa-shopping-cart"></i>
+           Ajouter au panier
+         </button>
+         <button class="btn btn-secondary" (click)="contactSeller(p); $event.stopPropagation()">
+           <i class="fa-solid fa-message"></i>
+           Contacter
+         </button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div class="empty-state" *ngIf="!isLoading && produits.length === 0">
+   <div class="empty-content">
+     <i class="fa-solid fa-box-open"></i>
+     <h3>Aucun produit disponible</h3>
+     <p>Il n'y a actuellement aucun produit approuvé disponible.</p>
+     <p class="empty-subtitle">Revenez bientôt pour découvrir nos nouveautés !</p>
+   </div>
+ </div>
 </div>

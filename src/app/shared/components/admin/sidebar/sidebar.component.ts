@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { ProductService } from '../../../../core/services/product.service';
 
 interface MenuItem {
   label: string;
@@ -42,9 +43,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
       badge: 3
     },
     {
+      label: 'Gestion Clients',
+      icon: 'fa-solid fa-users-cog',
+      route: '/admin/clients',
+      badge: 45
+    },
+    {
       label: 'Validation Produits',
       icon: 'fa-solid fa-check-circle',
-      route: '/admin/product-validation',
+      route: '/admin/validation-produits',
       badge: 8
     },
     {
@@ -80,7 +87,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private productService: ProductService) {
     this.router.events
       .pipe(
         takeUntil(this.destroy$),
@@ -89,10 +96,23 @@ export class SidebarComponent implements OnInit, OnDestroy {
       .subscribe((event: NavigationEnd) => {
         this.currentRoute = event.url;
       });
+
+    // Update badge count for pending products
+    this.updatePendingProductsBadge();
   }
 
   ngOnInit(): void {
     this.currentRoute = this.router.url;
+  }
+
+  private updatePendingProductsBadge(): void {
+    this.productService.getProducts().subscribe(products => {
+      const pendingCount = products.filter(p => p.status === 'pending').length;
+      const validationMenuItem = this.menuItems.find(item => item.label === 'Validation Produits');
+      if (validationMenuItem) {
+        validationMenuItem.badge = pendingCount;
+      }
+    });
   }
 
   ngOnDestroy(): void {

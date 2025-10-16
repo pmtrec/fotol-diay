@@ -40,7 +40,18 @@ export class AdminValidationComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (produits) => {
-          this.produitsEnAttente = produits.filter(p => p.statut === 'pending');
+          console.log('Tous les produits reçus:', produits);
+
+          // Filtrer les produits en attente et les trier par date d'ajout (du plus récent au plus ancien)
+          this.produitsEnAttente = produits
+            .filter(p => p.status === 'pending')
+            .sort((a, b) => {
+              const dateA = new Date(a.createdAt || a.createdAt || 0).getTime();
+              const dateB = new Date(b.createdAt || b.createdAt || 0).getTime();
+              return dateB - dateA;
+            });
+
+          console.log('Produits en attente trouvés:', this.produitsEnAttente);
           this.isLoading = false;
         },
         error: (error) => {
@@ -51,6 +62,7 @@ export class AdminValidationComponent implements OnInit, OnDestroy {
   }
 
   approuverProduit(produit: Produit): void {
+    if (!produit.id) return;
     this.productService.updateProductStatus(produit.id, 'approved')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -68,6 +80,7 @@ export class AdminValidationComponent implements OnInit, OnDestroy {
   }
 
   rejeterProduit(produit: Produit): void {
+    if (!produit.id) return;
     this.productService.updateProductStatus(produit.id, 'rejected')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -117,5 +130,9 @@ export class AdminValidationComponent implements OnInit, OnDestroy {
   getVendeurInfo(vendeurId?: number): string {
     // Simulation - à remplacer par un vrai service utilisateur
     return vendeurId ? `Vendeur #${vendeurId}` : 'Vendeur inconnu';
+  }
+
+  getMainImage(images: string[]): string {
+    return images && images.length > 0 ? images[0] : 'assets/images/no-image.png';
   }
 }

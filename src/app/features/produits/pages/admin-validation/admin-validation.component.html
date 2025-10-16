@@ -22,66 +22,58 @@
     </div>
   </div>
 
-  <!-- Products list -->
-  <div *ngIf="!isLoading && produitsEnAttente.length > 0" class="products-list">
-    <div class="product-item" *ngFor="let produit of produitsEnAttente">
-      <div class="product-image">
-        <img [src]="produit.photoFlouDataUrl" [alt]="produit.nom" class="blurred-image">
+  <!-- Products grid -->
+  <div *ngIf="!isLoading && produitsEnAttente.length > 0" class="products-grid">
+    <div class="product-card" *ngFor="let produit of produitsEnAttente">
+      <div class="product-image-container">
+        <img [src]="getMainImage(produit.images || [produit.images[0]])" [alt]="produit.name" class="product-image blurred-image">
         <div class="image-overlay">
           <button
             type="button"
             class="btn-view-real"
             (click)="openRealPhotoModal(produit)"
             title="Voir la photo réelle">
-            Voir photo réelle
+            👁 Voir photo réelle
           </button>
+        </div>
+        <div class="product-status-badge pending">
+          En attente
         </div>
       </div>
 
-      <div class="product-details">
-        <div class="product-header">
-          <h3 class="product-name">{{ produit.nom }}</h3>
-          <div class="product-meta">
-            <span class="vendeur">{{ getVendeurInfo(produit.vendeurId) }}</span>
-            <span class="date">{{ formatDate(produit.dateAjout) }}</span>
+      <div class="product-info">
+        <h3 class="product-name">{{ produit.name }}</h3>
+        <p class="product-description">{{ produit.description }}</p>
+
+        <div class="product-details-row">
+          <div class="product-detail">
+            <span class="detail-label">Prix:</span>
+            <span class="detail-value price">{{ produit.price | currency:'XAF':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="product-detail">
+            <span class="detail-label">Stock:</span>
+            <span class="detail-value">{{ produit.stock }} unités</span>
           </div>
         </div>
 
-        <div class="product-info">
-          <div class="info-group">
-            <label>Description:</label>
-            <p>{{ produit.description }}</p>
-          </div>
-
-          <div class="info-group">
-            <label>Catégorie:</label>
-            <p>{{ produit.categorie }}</p>
-          </div>
-
-          <div class="info-row">
-            <div class="info-item">
-              <label>Prix:</label>
-              <span class="value">{{ produit.prix | currency:'XAF':'symbol':'1.0-0' }}</span>
-            </div>
-            <div class="info-item">
-              <label>Stock:</label>
-              <span class="value">{{ produit.stock }}</span>
-            </div>
-          </div>
+        <div class="product-meta">
+          <span class="category">{{ produit.category }}</span>
+          <span class="vendeur">{{ getVendeurInfo(produit.sellerId) }}</span>
+          <span class="date">{{ produit.createdAt ? formatDate(produit.createdAt) : 'N/A' }}</span>
         </div>
       </div>
 
       <div class="product-actions">
         <button
           type="button"
-          class="btn btn-success"
+          class="btn-approve"
           (click)="approuverProduit(produit)"
           title="Approuver le produit">
           ✅ Approuver
         </button>
         <button
           type="button"
-          class="btn btn-danger"
+          class="btn-reject"
           (click)="rejeterProduit(produit)"
           title="Rejeter le produit">
           ❌ Rejeter
@@ -94,7 +86,7 @@
   <div *ngIf="showRealPhotoModal" class="modal-overlay" (click)="closeRealPhotoModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>{{ selectedProductForModal?.nom }}</h2>
+        <h2>{{ selectedProductForModal?.name }}</h2>
         <button type="button" class="btn-close" (click)="closeRealPhotoModal()">
           ×
         </button>
@@ -103,8 +95,8 @@
       <div class="modal-body">
         <img
           *ngIf="selectedProductForModal"
-          [src]="selectedProductForModal.photoDataUrl"
-          [alt]="selectedProductForModal.nom"
+          [src]="getMainImage(selectedProductForModal.images || [selectedProductForModal.images[0]])"
+          [alt]="selectedProductForModal.name"
           class="real-photo">
       </div>
 

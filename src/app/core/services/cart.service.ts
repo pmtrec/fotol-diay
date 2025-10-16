@@ -83,7 +83,10 @@ export class CartService {
   }
 
   private calculateCartTotals(items: CartItem[]): Cart {
-    const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    const total = items.reduce((sum, item) => {
+      const price = (item.product as any).prix || (item.product as any).price || 0;
+      return sum + (price * item.quantity);
+    }, 0);
     const itemCount = items.reduce((count, item) => count + item.quantity, 0);
 
     return {

@@ -101,10 +101,13 @@ export class AddProductComponent implements OnInit, OnDestroy {
 
       const formValue = this.productForm.value;
       const newProduct = {
-        ...formValue,
-        images: this.selectedImages,
+        name: formValue.name,
+        description: formValue.description,
+        price: formValue.price,
+        category: formValue.category,
+        stock: formValue.stock,
         sellerId: currentUser.id,
-        status: ProductStatus.PENDING
+        images: this.selectedImages
       };
 
       this.productService.addProduct(newProduct)

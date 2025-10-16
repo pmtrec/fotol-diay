@@ -4,6 +4,38 @@
     <p>Gérez vos produits soumis et approuvés</p>
   </div>
 
+  <!-- Filter tabs -->
+  <div *ngIf="!isLoading && produits.length > 0" class="filter-tabs">
+    <button
+      type="button"
+      class="filter-tab"
+      [class.active]="filtreActif === 'tous'"
+      (click)="changerFiltre('tous')">
+      Tous ({{ getNombreProduitsParStatut('tous') }})
+    </button>
+    <button
+      type="button"
+      class="filter-tab"
+      [class.active]="filtreActif === 'pending'"
+      (click)="changerFiltre('pending')">
+      En Attente ({{ getNombreProduitsParStatut('pending') }})
+    </button>
+    <button
+      type="button"
+      class="filter-tab"
+      [class.active]="filtreActif === 'approved'"
+      (click)="changerFiltre('approved')">
+      Approuvés ({{ getNombreProduitsParStatut('approved') }})
+    </button>
+    <button
+      type="button"
+      class="filter-tab"
+      [class.active]="filtreActif === 'rejected'"
+      (click)="changerFiltre('rejected')">
+      Rejetés ({{ getNombreProduitsParStatut('rejected') }})
+    </button>
+  </div>
+
   <!-- Loading state -->
   <div *ngIf="isLoading" class="loading">
     <p>Chargement de vos produits...</p>
@@ -20,11 +52,24 @@
     </div>
   </div>
 
+  <!-- Filtered empty state -->
+  <div *ngIf="!isLoading && produits.length > 0 && produitsFiltres.length === 0" class="empty-state">
+    <div class="empty-content">
+      <h2>Aucun produit trouvé pour ce filtre.</h2>
+      <p *ngIf="filtreActif === 'pending'">Vous n'avez pas de produits en attente d'approbation.</p>
+      <p *ngIf="filtreActif === 'approved'">Vous n'avez pas de produits approuvés.</p>
+      <p *ngIf="filtreActif === 'rejected'">Vous n'avez pas de produits rejetés.</p>
+      <button type="button" class="btn btn-secondary" (click)="changerFiltre('tous')">
+        Voir tous les produits
+      </button>
+    </div>
+  </div>
+
   <!-- Products grid -->
-  <div *ngIf="!isLoading && produits.length > 0" class="products-grid">
-    <div class="product-card" *ngFor="let produit of produits">
+  <div *ngIf="!isLoading && produits.length > 0 && produitsFiltres.length > 0" class="products-grid">
+    <div class="product-card" *ngFor="let produit of produitsFiltres">
       <div class="product-image">
-        <img [src]="produit.imageUrl" [alt]="produit.nom" class="product-image-preview">
+        <img [src]="getMainImage(produit.images || [produit.images[0]])" [alt]="produit.name" class="product-image-preview">
         <div class="image-overlay">
           <button
             type="button"
@@ -37,14 +82,14 @@
       </div>
 
       <div class="product-info">
-        <h3 class="product-name">{{ produit.nom }}</h3>
-        <p class="product-category">{{ produit.categorie }}</p>
+        <h3 class="product-name">{{ produit.name }}</h3>
+        <p class="product-category">{{ produit.category }}</p>
         <p class="product-description">{{ produit.description }}</p>
 
         <div class="product-details">
           <div class="detail-item">
             <span class="label">Prix:</span>
-            <span class="value">{{ produit.prix | currency:'XAF':'symbol':'1.0-0' }}</span>
+            <span class="value">{{ formatPrice(produit.price) }}</span>
           </div>
           <div class="detail-item">
             <span class="label">Stock:</span>
@@ -52,17 +97,17 @@
           </div>
           <div class="detail-item">
             <span class="label">Date:</span>
-            <span class="value">{{ formatDate(produit.dateAjout) }}</span>
+            <span class="value">{{ produit.createdAt ? formatDate(produit.createdAt) : 'N/A' }}</span>
           </div>
         </div>
 
         <div class="product-status">
-          <span class="badge" [ngClass]="getBadgeClass(produit.statut)">
+          <span class="badge" [ngClass]="getBadgeClass(produit.status)">
             <i class="fas" [ngClass]="{
-              'fa-clock': produit.statut === 'pending',
-              'fa-check': produit.statut === 'approved'
+              'fa-clock': produit.status === 'pending',
+              'fa-check': produit.status === 'approved'
             }"></i>
-            {{ getBadgeText(produit.statut) }}
+            {{ getBadgeText(produit.status) }}
           </span>
         </div>
       </div>
@@ -73,7 +118,7 @@
   <div *ngIf="showRealPhotoModal" class="modal-overlay" (click)="closeRealPhotoModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>{{ selectedProductForModal?.nom }}</h2>
+        <h2>{{ selectedProductForModal?.name }}</h2>
         <button type="button" class="btn-close" (click)="closeRealPhotoModal()">
           ×
         </button>
@@ -82,8 +127,8 @@
       <div class="modal-body">
         <img
           *ngIf="selectedProductForModal"
-          [src]="selectedProductForModal.imageUrl"
-          [alt]="selectedProductForModal.nom"
+          [src]="getMainImage(selectedProductForModal.images || [selectedProductForModal.images[0]])"
+          [alt]="selectedProductForModal.name"
           class="real-photo">
       </div>
 

@@ -23,9 +23,56 @@
 
   <!-- 🧑‍💼 Liens utilisateur -->
   <div class="navbar-right flex items-center gap-6">
-    <div class="nav-link flex items-center gap-1 cursor-pointer hover:text-blue-600" (click)="goToLogin()">
-      <i class="fa-regular fa-user"></i> Se connecter
+    <!-- Menu utilisateur pour les utilisateurs connectés -->
+    <div class="nav-item profile-container" *ngIf="currentUser; else loginLink">
+      <div class="profile-btn" (click)="toggleUserDropdown()">
+        <div class="profile-avatar">
+          {{ getUserInitials() }}
+        </div>
+        <div class="profile-info">
+          <span class="profile-name">{{ getUserDisplayName() }}</span>
+          <span class="profile-role">{{ currentUser.role | titlecase }}</span>
+        </div>
+        <i class="fa-solid fa-chevron-down dropdown-arrow" [class.rotated]="showUserDropdown"></i>
+      </div>
+
+      <!-- Dropdown menu -->
+      <div class="profile-dropdown" [class.show]="showUserDropdown">
+        <div class="dropdown-header">
+          <div class="user-avatar">
+            {{ getUserInitials() }}
+          </div>
+          <div class="user-info">
+            <h4>{{ getUserDisplayName() }}</h4>
+            <p>{{ currentUser.email }}</p>
+          </div>
+        </div>
+
+        <div class="dropdown-menu">
+          <a class="dropdown-item" (click)="goToDashboard()">
+            <i class="fa-solid fa-tachometer-alt"></i>
+            Mon tableau de bord
+          </a>
+          <a class="dropdown-item" (click)="goToProfile()">
+            <i class="fa-regular fa-user"></i>
+            Mon profil
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item text-danger" (click)="logout()">
+            <i class="fa-solid fa-sign-out-alt"></i>
+            Déconnexion
+          </a>
+        </div>
+      </div>
     </div>
+
+    <!-- Lien de connexion pour les utilisateurs non connectés -->
+    <ng-template #loginLink>
+      <div class="nav-link flex items-center gap-1 cursor-pointer hover:text-blue-600" (click)="goToLogin()">
+        <i class="fa-regular fa-user"></i> Se connecter
+      </div>
+    </ng-template>
+
     <div class="nav-link flex items-center gap-1 cursor-pointer hover:text-blue-600">
       <i class="fa-regular fa-circle-question"></i> Aide
     </div>

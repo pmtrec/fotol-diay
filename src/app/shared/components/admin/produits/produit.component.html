@@ -1,29 +1,91 @@
 <div class="produits-container">
-  <h2 class="section-title">Produits populaires</h2>
+ <div class="header-section">
+   <h2 class="section-title">Gestion des Produits</h2>
+   <p class="section-subtitle">Administration et validation des produits</p>
+ </div>
 
-  <div class="produits-grid">
-    <div class="produit-card" *ngFor="let p of produits">
-      <div class="image-container">
-        <img [src]="p.imageUrl" [alt]="p.nom" />
-        <div *ngIf="p.verified" class="badge-verified">✔ certifié</div>
-      </div>
+ <div class="loading-state" *ngIf="isLoading">
+   <div class="loading-spinner">
+     <i class="fa-solid fa-spinner fa-spin"></i>
+     <p>Chargement des produits...</p>
+   </div>
+ </div>
 
-      <div class="produit-info">
-        <h3 class="produit-nom">{{ p.nom }}</h3>
-        <p class="produit-prix">{{ p.prix }}</p>
-        <p class="produit-quantite">Quantité min: {{ p.quantiteMin }}</p>
+ <div class="produits-grid" *ngIf="!isLoading">
+   <div class="produit-card" *ngFor="let p of produits">
+     <div class="image-container">
+       <img
+         [src]="getMainImage(p.images || [p.imageUrl])"
+         [alt]="p.name"
+         (error)="onImageError($event)"
+         loading="lazy" />
+       <div class="image-overlay">
+         <div class="badge-status" [ngClass]="getStatusClass(p.statut || 'pending')">
+           <i class="fa-solid" [ngClass]="getStatusIcon(p.statut || 'pending')"></i>
+           {{ getStatusLabel(p.statut || 'pending') }}
+         </div>
+         <div class="quick-actions">
+           <button class="quick-action-btn" (click)="editProduct(p)" title="Modifier">
+             <i class="fa-solid fa-edit"></i>
+           </button>
+           <button class="quick-action-btn" (click)="deleteProduct(p)" title="Supprimer">
+             <i class="fa-solid fa-trash"></i>
+           </button>
+         </div>
+       </div>
+       <div class="verification-badge" *ngIf="p.verified">
+         <i class="fa-solid fa-shield-check"></i>
+         Certifié
+       </div>
+     </div>
 
-        <div class="produit-fournisseur">
-          <img
-            *ngIf="p.pays"
-            [src]="'https://flagcdn.com/24x18/' + p.pays.toLowerCase() + '.png'"
-            [alt]="p.pays"
-          />
-          <span>{{ p.fournisseur }}</span>
-        </div>
+     <div class="produit-info">
+       <div class="category-tag">{{ p.categorie }}</div>
+       <h3 class="produit-nom">{{ p.name }}</h3>
+       <p class="produit-description">{{ p.description }}</p>
 
-        <button class="btn-contact">Contacter le fournisseur</button>
-      </div>
-    </div>
-  </div>
+       <div class="price-section">
+         <span class="current-price">{{ formatPrice(p.price) }}</span>
+         <span class="quantity-info">Min: {{ p.quantiteMin }}</span>
+       </div>
+
+       <div class="vendeur-info">
+         <div class="vendeur-avatar">
+           <i class="fa-solid fa-flag"></i>
+         </div>
+         <span class="vendeur-name">{{ p.fournisseur }}</span>
+         <img
+           *ngIf="p.pays"
+           [src]="'https://flagcdn.com/24x18/' + p.pays.toLowerCase() + '.png'"
+           [alt]="p.pays"
+           class="country-flag"
+           (error)="onFlagError($event)" />
+       </div>
+
+       <div class="card-actions">
+         <button class="btn btn-primary" (click)="validateProduct(p)">
+           <i class="fa-solid fa-check"></i>
+           Valider
+         </button>
+         <button class="btn btn-secondary" (click)="contactSupplier(p)">
+           <i class="fa-solid fa-message"></i>
+           Contacter
+         </button>
+         <button class="btn btn-danger" (click)="deleteProduct(p)">
+           <i class="fa-solid fa-trash"></i>
+           Supprimer
+         </button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div class="empty-state" *ngIf="!isLoading && produits.length === 0">
+   <div class="empty-content">
+     <i class="fa-solid fa-boxes"></i>
+     <h3>Aucun produit trouvé</h3>
+     <p>Il n'y a actuellement aucun produit à gérer.</p>
+     <p class="empty-subtitle">Les produits apparaîtront ici une fois ajoutés par les vendeurs.</p>
+   </div>
+ </div>
 </div>

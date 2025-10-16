@@ -1,28 +1,37 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { Category } from '../models/category.model';
+import { ApiService } from './api.service';
 
-// Interface Produit selon les spécifications
+// Interface Produit qui correspond exactement à db.json
 export interface Produit {
-  id: number;
-  nom: string;
+  id?: string;
+  name: string;
   description: string;
-  prix: number;
-  categorie: string;
+  price: number;
+  category: string;
   stock: number;
-  imageUrl: string;
-  vendeurId?: number;
-  statut: 'pending' | 'approved' | 'rejected';
-  dateAjout: string;
-  photoFlouDataUrl?: string;
-  photoDataUrl?: string;
+  images: string[];
+  status: 'pending' | 'approved' | 'rejected';
+  sellerId: number;
   rating?: number;
-  images?: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
   validatedBy?: number;
-  validatedAt?: Date;
+  validatedAt?: string;
   rejectionReason?: string;
+}
+
+// Interface pour la création/modification de produit
+export interface ProduitCreate {
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  stock: number;
+  images: string[];
+  sellerId: number;
 }
 
 @Injectable({
@@ -36,126 +45,82 @@ export class ProductService {
   public products$ = this.productsSubject.asObservable();
   public categories$ = this.categoriesSubject.asObservable();
 
-  constructor() {
+  constructor(private apiService: ApiService) {
     this.loadProducts();
     this.loadCategories();
   }
 
-  // Récupérer tous les produits depuis localStorage
+  // Récupérer tous les produits depuis l'API JSON Server
   getProducts(): Observable<Produit[]> {
-    return this.products$;
+    return this.apiService.get<Produit[]>('/products');
   }
 
   // Récupérer les produits d'un vendeur spécifique
   getProductsByVendeur(vendeurId?: number): Observable<Produit[]> {
-    const currentProducts = this.productsSubject.value;
-    const vendeurProducts = vendeurId
-      ? currentProducts.filter(product => product.vendeurId === vendeurId)
-      : currentProducts;
-    return of(vendeurProducts);
+    if (vendeurId) {
+      return this.apiService.get<Produit[]>(`/products?sellerId=${vendeurId}`);
+    }
+    return this.apiService.get<Produit[]>('/products');
   }
 
-  // Ajouter un produit dans localStorage
-  addProduct(product: Produit): Observable<Produit> {
-    const currentProducts = this.productsSubject.value;
+  // Récupérer un produit par son ID
+  getProductById(id: string): Observable<Produit> {
+    return this.apiService.get<Produit>(`/products/${id}`);
+  }
 
-    // Générer un nouvel ID basé sur le timestamp
-    const newProduct: Produit = {
-      ...product,
-      id: Date.now(),
-      statut: 'pending',
-      dateAjout: new Date().toISOString()
-    };
-
-    const updatedProducts = [...currentProducts, newProduct];
-    this.productsSubject.next(updatedProducts);
-    this.saveProductsToStorage(updatedProducts);
-
-    return of(newProduct);
+  // Ajouter un produit via l'API
+  addProduct(product: ProduitCreate): Observable<Produit> {
+    return this.apiService.post<Produit>('/products', product);
   }
 
   // Mettre à jour le statut d'un produit
-  updateProductStatus(id: number, statut: Produit['statut']): Observable<Produit | null> {
-    const currentProducts = this.productsSubject.value;
-    const productIndex = currentProducts.findIndex(product => product.id === id);
-
-    if (productIndex === -1) {
-      return of(null);
-    }
-
-    const updatedProducts = [...currentProducts];
-    updatedProducts[productIndex] = {
-      ...updatedProducts[productIndex],
-      statut
+  updateProductStatus(id: string, status: Produit['status']): Observable<Produit> {
+    const updateData = {
+      status,
+      updatedAt: new Date().toISOString(),
+      validatedBy: 1, // Admin ID - à remplacer par le service d'auth
+      validatedAt: new Date().toISOString()
     };
-
-    this.productsSubject.next(updatedProducts);
-    this.saveProductsToStorage(updatedProducts);
-
-    return of(updatedProducts[productIndex]);
+    return this.apiService.patch<Produit>(`/products/${id}`, updateData);
   }
 
   // Supprimer un produit
-  deleteProduct(id: number): Observable<boolean> {
-    const currentProducts = this.productsSubject.value;
-    const updatedProducts = currentProducts.filter(product => product.id !== id);
-
-    if (updatedProducts.length === currentProducts.length) {
-      return of(false); // Produit non trouvé
-    }
-
-    this.productsSubject.next(updatedProducts);
-    this.saveProductsToStorage(updatedProducts);
-
-    return of(true);
+  deleteProduct(id: string): Observable<void> {
+    return this.apiService.delete<void>(`/products/${id}`);
   }
 
-  // Méthode privée pour sauvegarder dans localStorage
-  private saveProductsToStorage(products: Produit[]): void {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(products));
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde dans localStorage:', error);
-    }
-  }
-
-  // Méthode privée pour charger depuis localStorage
-  private loadProducts(): void {
-    try {
-      const storedProducts = localStorage.getItem(this.STORAGE_KEY);
-      if (storedProducts) {
-        const products = JSON.parse(storedProducts) as Produit[];
-        this.productsSubject.next(products);
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement depuis localStorage:', error);
-      this.productsSubject.next([]);
-    }
-  }
-
-  // Récupérer les catégories depuis localStorage
+  // Récupérer les catégories depuis l'API
   getCategories(): Observable<Category[]> {
-    return this.categories$;
+    return this.apiService.get<Category[]>('/categories');
   }
 
-  // Méthode privée pour charger les catégories depuis localStorage
+  // Méthode privée pour charger les produits depuis l'API
+  private loadProducts(): void {
+    this.apiService.get<Produit[]>('/products').subscribe({
+      next: (products) => {
+        this.productsSubject.next(products);
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des produits depuis l\'API:', error);
+        this.productsSubject.next([]);
+      }
+    });
+  }
+
+  // Méthode privée pour charger les catégories depuis l'API
   private loadCategories(): void {
-    try {
-      const storedCategories = localStorage.getItem(this.CATEGORIES_STORAGE_KEY);
-      if (storedCategories) {
-        const categories = JSON.parse(storedCategories) as Category[];
+    this.apiService.get<Category[]>('/categories').subscribe({
+      next: (categories) => {
         this.categoriesSubject.next(categories);
-      } else {
-        // Si aucune catégorie n'existe, créer des catégories par défaut
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des catégories depuis l\'API:', error);
         this.initializeDefaultCategories();
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des catégories:', error);
-      this.initializeDefaultCategories();
-    }
+    });
   }
 
-  // Initialiser les catégories par défaut
+  // Initialiser les catégories par défaut (fallback)
   private initializeDefaultCategories(): void {
     const defaultCategories: Category[] = [
       {
@@ -197,15 +162,83 @@ export class ProductService {
     ];
 
     this.categoriesSubject.next(defaultCategories);
-    this.saveCategoriesToStorage(defaultCategories);
   }
 
-  // Méthode privée pour sauvegarder les catégories dans localStorage
-  private saveCategoriesToStorage(categories: Category[]): void {
-    try {
-      localStorage.setItem(this.CATEGORIES_STORAGE_KEY, JSON.stringify(categories));
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde des catégories:', error);
-    }
+  // =================== MÉTHODES DE COMPATIBILITÉ ===================
+  // Ces méthodes permettent aux anciens composants de fonctionner
+  // pendant la transition vers la nouvelle structure de données
+
+  // Ancienne méthode pour la compatibilité (utilise localStorage temporairement)
+  getProductsByVendeurOld(vendeurId?: number): Observable<any[]> {
+    const currentProducts = this.productsSubject.value;
+    const vendeurProducts = vendeurId
+      ? currentProducts.filter(product => product.sellerId === vendeurId)
+      : currentProducts;
+    return of(vendeurProducts.map(p => this.transformProduitToOld(p)));
+  }
+
+  // Transformer le nouveau format vers l'ancien pour la compatibilité
+  private transformProduitToOld(produit: Produit): any {
+    return {
+      id: parseInt(produit.id || '0'),
+      nom: produit.name,
+      description: produit.description,
+      prix: produit.price,
+      categorie: produit.category,
+      stock: produit.stock,
+      imageUrl: produit.images?.[0] || '',
+      vendeurId: produit.sellerId,
+      statut: produit.status,
+      dateAjout: produit.createdAt || new Date().toISOString(),
+      images: produit.images || [],
+      status: produit.status,
+      createdAt: produit.createdAt,
+      updatedAt: produit.updatedAt,
+      validatedBy: produit.validatedBy,
+      validatedAt: produit.validatedAt,
+      rejectionReason: produit.rejectionReason
+    };
+  }
+
+  // Ancienne méthode pour la compatibilité
+  addProductOld(product: any): Observable<any> {
+    const newProduct: ProduitCreate = {
+      name: product.nom,
+      description: product.description,
+      price: product.prix,
+      category: product.categorie,
+      stock: product.stock,
+      images: product.images || [product.imageUrl],
+      sellerId: product.vendeurId || 2
+    };
+
+    return this.apiService.post<Produit>('/products', newProduct).pipe(
+      map(createdProduct => this.transformProduitToOld(createdProduct))
+    );
+  }
+
+  // Ancienne méthode pour la compatibilité
+  updateProductStatusOld(id: number, statut: string): Observable<any> {
+    const productId = id.toString();
+    const statusMap: { [key: string]: Produit['status'] } = {
+      'pending': 'pending',
+      'approved': 'approved',
+      'rejected': 'rejected'
+    };
+
+    const status = statusMap[statut] || 'pending';
+
+    return this.updateProductStatus(productId, status).pipe(
+      map(product => this.transformProduitToOld(product))
+    );
+  }
+
+  // Ancienne méthode pour la compatibilité
+  deleteProductOld(id: number): Observable<boolean> {
+    const productId = id.toString();
+    return this.deleteProduct(productId).pipe(
+      map(() => true),
+      catchError(() => of(false))
+    );
   }
 }

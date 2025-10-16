@@ -1,29 +1,90 @@
 <div class="produits-container">
-  <h2 class="section-title">Produits populaires</h2>
+ <div class="header-section">
+   <h2 class="section-title">Mes Produits</h2>
+   <p class="section-subtitle">Gérez votre catalogue de produits</p>
+ </div>
 
-  <div class="produits-grid">
-    <div class="produit-card" *ngFor="let p of produits">
-      <div class="image-container">
-        <img [src]="p.imageUrl" [alt]="p.nom" />
-        <div *ngIf="p.verified" class="badge-verified">✔ certifié</div>
-      </div>
+ <div class="loading-state" *ngIf="isLoading">
+   <div class="loading-spinner">
+     <i class="fa-solid fa-spinner fa-spin"></i>
+     <p>Chargement de vos produits...</p>
+   </div>
+ </div>
 
-      <div class="produit-info">
-        <h3 class="produit-nom">{{ p.nom }}</h3>
-        <p class="produit-prix">{{ p.prix }}</p>
-        <p class="produit-quantite">Quantité min: {{ p.quantiteMin }}</p>
+ <div class="produits-grid" *ngIf="!isLoading">
+   <div class="produit-card" *ngFor="let p of produits">
+     <div class="image-container">
+       <img
+         [src]="getMainImage(p.images || [p.images[0]])"
+         [alt]="p.name"
+         (error)="onImageError($event)"
+         loading="lazy" />
+       <div class="image-overlay">
+         <div class="badge-status" [ngClass]="getStatusClass(p.status)">
+           <i class="fa-solid" [ngClass]="getStatusIcon(p.status)"></i>
+           {{ getStatusLabel(p.status) }}
+         </div>
+         <div class="quick-actions">
+           <button class="quick-action-btn" (click)="editProduct(p)" title="Modifier">
+             <i class="fa-solid fa-edit"></i>
+           </button>
+           <button class="quick-action-btn" (click)="deleteProduct(p)" title="Supprimer">
+             <i class="fa-solid fa-trash"></i>
+           </button>
+         </div>
+       </div>
+       <div class="stock-indicator" [class.low-stock]="p.stock < 10" [class.out-of-stock]="p.stock === 0">
+         <span *ngIf="p.stock === 0">Épuisé</span>
+         <span *ngIf="p.stock > 0 && p.stock < 10">{{ p.stock }} restant</span>
+         <span *ngIf="p.stock >= 10">En stock</span>
+       </div>
+     </div>
 
-        <div class="produit-fournisseur">
-          <img
-            *ngIf="p.pays"
-            [src]="'https://flagcdn.com/24x18/' + p.pays.toLowerCase() + '.png'"
-            [alt]="p.pays"
-          />
-          <span>{{ p.fournisseur }}</span>
-        </div>
+     <div class="produit-info">
+       <div class="category-tag">{{ p.category }}</div>
+       <h3 class="produit-nom">{{ p.name }}</h3>
+       <p class="produit-description">{{ p.description }}</p>
 
-        <button class="btn-contact">Contacter le fournisseur</button>
-      </div>
-    </div>
-  </div>
+       <div class="price-section">
+         <span class="current-price">{{ formatPrice(p.price) }}</span>
+         <span class="stock-info">{{ p.stock }} unités</span>
+       </div>
+
+       <div class="vendeur-info">
+         <div class="vendeur-avatar">
+           <i class="fa-solid fa-user"></i>
+         </div>
+         <span class="vendeur-name">Produit #{{ p.id }}</span>
+       </div>
+
+       <div class="card-actions">
+         <button class="btn btn-primary" (click)="editProduct(p)">
+           <i class="fa-solid fa-edit"></i>
+           Modifier
+         </button>
+         <button class="btn btn-secondary" (click)="viewStats(p)">
+           <i class="fa-solid fa-chart-bar"></i>
+           Stats
+         </button>
+         <button class="btn btn-danger" (click)="deleteProduct(p)">
+           <i class="fa-solid fa-trash"></i>
+           Supprimer
+         </button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div class="empty-state" *ngIf="!isLoading && produits.length === 0">
+   <div class="empty-content">
+     <i class="fa-solid fa-store-slash"></i>
+     <h3>Aucun produit trouvé</h3>
+     <p>Vous n'avez pas encore ajouté de produits à votre catalogue.</p>
+     <p class="empty-subtitle">Commencez par ajouter votre premier produit !</p>
+     <button class="btn btn-primary" (click)="addNewProduct()">
+       <i class="fa-solid fa-plus"></i>
+       Ajouter un produit
+     </button>
+   </div>
+ </div>
 </div>
