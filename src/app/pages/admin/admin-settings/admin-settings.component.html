@@ -1,0 +1,245 @@
+<div class="admin-settings">
+  <div class="page-header">
+    <h1>Paramètres Système</h1>
+    <p>Gérez les paramètres généraux de la plateforme</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="settings-tabs">
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'categories'"
+      (click)="setActiveTab('categories')">
+      <i class="fa-solid fa-tags"></i>
+      Gestion des Catégories
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'system'"
+      (click)="setActiveTab('system')">
+      <i class="fa-solid fa-cog"></i>
+      Paramètres Système
+    </button>
+  </div>
+
+  <!-- Categories Management Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'categories'">
+    <div class="section-header">
+      <h2>Gestion des Catégories</h2>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="refreshCategories()" [disabled]="isLoading">
+          <i class="fa-solid fa-refresh"></i>
+          Actualiser
+        </button>
+        <button class="btn btn-primary" (click)="showAddCategoryForm()">
+          <i class="fa-solid fa-plus"></i>
+          Ajouter une Catégorie
+        </button>
+      </div>
+    </div>
+
+    <!-- Add/Edit Category Form -->
+    <div class="category-form" *ngIf="showCategoryForm">
+      <div class="form-card">
+        <h3>{{ editingCategory ? 'Modifier' : 'Ajouter' }} une Catégorie</h3>
+        <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="categoryName">Nom de la Catégorie *</label>
+              <input
+                type="text"
+                id="categoryName"
+                formControlName="name"
+                [class.invalid]="isFieldInvalid(categoryForm, 'name')"
+                placeholder="Ex: Électronique">
+              <div class="error-message" *ngIf="isFieldInvalid(categoryForm, 'name')">
+                {{getFieldError(categoryForm, 'name')}}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="categoryDescription">Description *</label>
+              <textarea
+                id="categoryDescription"
+                formControlName="description"
+                [class.invalid]="isFieldInvalid(categoryForm, 'description')"
+                rows="3"
+                placeholder="Décrivez cette catégorie..."></textarea>
+              <div class="error-message" *ngIf="isFieldInvalid(categoryForm, 'description')">
+                {{getFieldError(categoryForm, 'description')}}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isActive">
+              <span class="checkmark"></span>
+              Catégorie active
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancelCategoryEdit()">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+              {{ editingCategory ? 'Modifier' : 'Ajouter' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Categories List -->
+    <div class="categories-list" *ngIf="!isLoading">
+      <div class="categories-grid">
+        <div class="category-card" *ngFor="let category of categories">
+          <div class="category-header">
+            <h4>{{ category.name }}</h4>
+            <div class="category-actions">
+              <button class="btn-icon" (click)="editCategory(category)" title="Modifier">
+                <i class="fa-solid fa-edit"></i>
+              </button>
+              <button class="btn-icon" (click)="deleteCategory(category)" title="Supprimer">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <p class="category-description">{{ category.description }}</p>
+
+          <div class="category-stats">
+            <span class="stat-item">
+              <i class="fa-solid fa-box"></i>
+              {{ category.productCount }} produits
+            </span>
+            <label class="switch">
+              <input
+                type="checkbox"
+                [checked]="category.isActive"
+                (change)="toggleCategoryStatus(category)">
+              <span class="slider"></span>
+            </label>
+            <span class="status" [class.active]="category.isActive">
+              {{ category.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+
+          <div class="category-dates">
+            <small>Créée le: {{ category.createdAt | date:'dd/MM/yyyy' }}</small>
+            <small>Dernière modification: {{ category.updatedAt | date:'dd/MM/yyyy' }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading" *ngIf="isLoading">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Chargement...
+    </div>
+  </div>
+
+  <!-- System Settings Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'system'">
+    <div class="section-header">
+      <h2>Paramètres Système</h2>
+    </div>
+
+    <form [formGroup]="systemForm" (ngSubmit)="saveSystemSettings()" class="system-form">
+      <div class="form-card">
+        <h3>Informations Générales</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="siteName">Nom du Site *</label>
+            <input
+              type="text"
+              id="siteName"
+              formControlName="siteName"
+              [class.invalid]="isFieldInvalid(systemForm, 'siteName')"
+              placeholder="Klick Market">
+            <div class="error-message" *ngIf="isFieldInvalid(systemForm, 'siteName')">
+              {{getFieldError(systemForm, 'siteName')}}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contactEmail">Email de Contact *</label>
+            <input
+              type="email"
+              id="contactEmail"
+              formControlName="contactEmail"
+              [class.invalid]="isFieldInvalid(systemForm, 'contactEmail')"
+              placeholder="contact@klick.com">
+            <div class="error-message" *ngIf="isFieldInvalid(systemForm, 'contactEmail')">
+              {{getFieldError(systemForm, 'contactEmail')}}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="siteDescription">Description du Site *</label>
+          <textarea
+            id="siteDescription"
+            formControlName="siteDescription"
+            [class.invalid]="isFieldInvalid(systemForm, 'siteDescription')"
+            rows="3"
+            placeholder="Plateforme de vente en ligne..."></textarea>
+          <div class="error-message" *ngIf="isFieldInvalid(systemForm, 'siteDescription')">
+            {{getFieldError(systemForm, 'siteDescription')}}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>Configuration Vendeur</h3>
+
+        <div class="form-group">
+          <label for="maxProductsPerSeller">Nombre Maximum de Produits par Vendeur *</label>
+          <input
+            type="number"
+            id="maxProductsPerSeller"
+            formControlName="maxProductsPerSeller"
+            [class.invalid]="isFieldInvalid(systemForm, 'maxProductsPerSeller')"
+            min="1"
+            placeholder="100">
+          <div class="error-message" *ngIf="isFieldInvalid(systemForm, 'maxProductsPerSeller')">
+            {{getFieldError(systemForm, 'maxProductsPerSeller')}}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="allowSelfValidation">
+            <span class="checkmark"></span>
+            Permettre aux vendeurs de valider leurs propres produits
+          </label>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>Maintenance</h3>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="maintenanceMode">
+            <span class="checkmark"></span>
+            Mode maintenance activé
+          </label>
+          <small class="form-help">
+            En mode maintenance, seuls les administrateurs peuvent accéder à la plateforme.
+          </small>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          <i class="fa-solid fa-save"></i>
+          Sauvegarder les Paramètres
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3002/api',
+  apiUrl: '/api',
   mockData: true,
   enableImageUpload: true,
   maxUploadSize: 5 * 1024 * 1024, // 5MB

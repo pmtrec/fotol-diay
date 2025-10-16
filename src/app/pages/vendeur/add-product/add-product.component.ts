@@ -47,6 +47,11 @@ export class AddProductComponent implements OnInit, OnDestroy {
     this.loadCategories();
   }
 
+  // Method to refresh categories (can be called from outside if needed)
+  refreshCategories(): void {
+    this.loadCategories();
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();

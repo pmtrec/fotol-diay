@@ -54,7 +54,7 @@
   ],
   "categories": [
     {
-      "id": "1",
+      "id": 1,
       "name": "Électronique",
       "description": "Téléphones, ordinateurs, tablettes et accessoires",
       "image": "assets/images/categories/electronics.jpg",
@@ -64,7 +64,7 @@
       "productCount": 15
     },
     {
-      "id": "2",
+      "id": 2,
       "name": "Mode",
       "description": "Vêtements, chaussures et accessoires de mode",
       "image": "assets/images/categories/fashion.jpg",
@@ -74,7 +74,7 @@
       "productCount": 25
     },
     {
-      "id": "3",
+      "id": 3,
       "name": "Maison & Jardin",
       "description": "Décoration, meubles et articles de jardin",
       "image": "assets/images/categories/home.jpg",
@@ -84,7 +84,7 @@
       "productCount": 18
     },
     {
-      "id": "4",
+      "id": 4,
       "name": "Sports & Loisirs",
       "description": "Équipements sportifs et articles de loisir",
       "image": "assets/images/categories/sports.jpg",
@@ -94,7 +94,7 @@
       "productCount": 12
     },
     {
-      "id": "5",
+      "id": 5,
       "name": "Livres",
       "description": "Livres, ebooks et magazines",
       "image": "assets/images/categories/books.jpg",
@@ -102,6 +102,39 @@
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z",
       "productCount": 8
+    },
+    {
+      "id": "6896",
+      "name": "Test Category",
+      "description": "Test category description",
+      "isActive": true
+    },
+    {
+      "id": "4174",
+      "name": "Test Category 2",
+      "description": "Test description",
+      "isActive": true
+    },
+    {
+      "id": "707a",
+      "name": "Test Category via Proxy",
+      "description": "Testing if proxy works",
+      "isActive": true
+    },
+    {
+      "id": "d420",
+      "name": "alwar",
+      "description": "ffffffff",
+      "isActive": true,
+      "createdAt": "2025-10-16T18:08:58.378Z",
+      "updatedAt": "2025-10-16T18:08:58.378Z",
+      "productCount": 0
+    },
+    {
+      "id": "9fee",
+      "name": "Test Category via Fixed Proxy",
+      "description": "Testing if proxy works after environment fix",
+      "isActive": true
     }
   ],
   "products": [
@@ -265,6 +298,18 @@
       "updatedAt": "2024-10-15T00:00:00.000Z",
       "validatedBy": 1,
       "validatedAt": "2024-10-16T00:00:00.000Z"
+    },
+    {
+      "id": "b4b0",
+      "name": "Étudiants ",
+      "description": "ffffffffffffffff",
+      "price": 0.01,
+      "category": "alwar",
+      "stock": 1,
+      "sellerId": 2,
+      "images": [
+        "blob:http://localhost:34299/225e1f5b-b41f-4aa1-86b4-a2db908f2b78"
+      ]
     }
   ],
   "uploads": [

@@ -94,6 +94,31 @@ export class ProductService {
     return this.apiService.get<Category[]>('/categories');
   }
 
+  // Créer une nouvelle catégorie
+  createCategory(category: Omit<Category, 'id' | 'createdAt' | 'updatedAt' | 'productCount'>): Observable<Category> {
+    const newCategory = {
+      ...category,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      productCount: 0
+    };
+    return this.apiService.post<Category>('/categories', newCategory);
+  }
+
+  // Mettre à jour une catégorie existante
+  updateCategory(id: number, category: Partial<Category>): Observable<Category> {
+    const updatedCategory = {
+      ...category,
+      updatedAt: new Date()
+    };
+    return this.apiService.patch<Category>(`/categories/${id}`, updatedCategory);
+  }
+
+  // Supprimer une catégorie
+  deleteCategory(id: number): Observable<void> {
+    return this.apiService.delete<void>(`/categories/${id}`);
+  }
+
   // Méthode privée pour charger les produits depuis l'API
   private loadProducts(): void {
     this.apiService.get<Produit[]>('/products').subscribe({

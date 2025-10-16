@@ -131,7 +131,7 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+        loadComponent: () => import('./pages/admin/admin-settings/admin-settings.component').then(m => m.AdminSettingsComponent)
       },
       {
         path: 'support',
