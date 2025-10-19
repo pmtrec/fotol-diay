@@ -1,130 +1,167 @@
-<div class="vendeur-dashboard">
- <div class="dashboard-header">
-   <h1>Tableau de Bord Vendeur</h1>
-   <p>Gestion de vos produits et supervision de vos ventes</p>
- </div>
+<div class="admin-dashboard">
+<div class="welcome-section">
+  <h1>Welcome to the admin dashboard</h1>
+  <p>Manage your platform efficiently with real-time insights and controls.</p>
+</div>
 
- <!-- Statistiques -->
- <div class="stats-grid">
-   <div class="stat-card">
-     <div class="stat-icon total">
-       <i class="icon-products"></i>
-     </div>
-     <div class="stat-content">
-       <h3>{{dashboardStats.totalProducts}}</h3>
-       <p>Total Produits</p>
-     </div>
-   </div>
+<div class="dashboard-header">
+  <h2>Dashboard Overview</h2>
+  <p>System overview and key metrics</p>
+  <button class="btn btn-primary" (click)="refreshData()">
+    <i class="icon-refresh"></i>
+    Refresh
+  </button>
+</div>
 
-   <div class="stat-card urgent">
-     <div class="stat-icon pending">
-       <i class="icon-clock"></i>
-     </div>
-     <div class="stat-content">
-       <h3>{{dashboardStats.pendingProducts}}</h3>
-       <p>En Attente</p>
-     </div>
-   </div>
+<!-- Key Statistics -->
+<div class="stats-grid">
+  <div class="stat-card primary">
+    <div class="stat-icon users">
+      <i class="icon-users"></i>
+    </div>
+    <div class="stat-content">
+      <h3>{{adminStats.totalUsers}}</h3>
+      <p>Total Users</p>
+      <span class="growth" [ngClass]="getGrowthClass(adminStats.userGrowth)">
+        <i [ngClass]="getGrowthIcon(adminStats.userGrowth)"></i>
+        {{adminStats.userGrowth}}%
+      </span>
+    </div>
+  </div>
 
-   <div class="stat-card">
-     <div class="stat-icon approved">
-       <i class="icon-check"></i>
-     </div>
-     <div class="stat-content">
-       <h3>{{dashboardStats.approvedProducts}}</h3>
-       <p>Approuvés</p>
-     </div>
-   </div>
+  <div class="stat-card success">
+    <div class="stat-icon sales">
+      <i class="icon-dollar"></i>
+    </div>
+    <div class="stat-content">
+      <h3>{{adminStats.monthlySales | currency:'XAF':'symbol':'1.0-0'}}</h3>
+      <p>Monthly Sales</p>
+      <span class="growth" [ngClass]="getGrowthClass(adminStats.salesGrowth)">
+        <i [ngClass]="getGrowthIcon(adminStats.salesGrowth)"></i>
+        {{adminStats.salesGrowth}}%
+      </span>
+    </div>
+  </div>
 
-   <div class="stat-card">
-     <div class="stat-icon value">
-       <i class="icon-money"></i>
-     </div>
-     <div class="stat-content">
-       <h3>{{dashboardStats.totalValue | currency:'XAF':'symbol':'1.0-0'}}</h3>
-       <p>Valeur Stock</p>
-     </div>
-   </div>
+  <div class="stat-card info">
+    <div class="stat-icon products">
+      <i class="icon-box"></i>
+    </div>
+    <div class="stat-content">
+      <h3>{{adminStats.totalProducts}}</h3>
+      <p>Total Products</p>
+      <span class="growth" [ngClass]="getGrowthClass(adminStats.productGrowth)">
+        <i [ngClass]="getGrowthIcon(adminStats.productGrowth)"></i>
+        {{adminStats.productGrowth}}%
+      </span>
+    </div>
+  </div>
 
-   <div class="stat-card warning">
-     <div class="stat-icon low-stock">
-       <i class="icon-alert"></i>
-     </div>
-     <div class="stat-content">
-       <h3>{{dashboardStats.lowStockProducts}}</h3>
-       <p>Stock Faible</p>
-     </div>
-   </div>
- </div>
+  <div class="stat-card warning">
+    <div class="stat-icon revenue">
+      <i class="icon-chart"></i>
+    </div>
+    <div class="stat-content">
+      <h3>{{adminStats.totalRevenue | currency:'XAF':'symbol':'1.0-0'}}</h3>
+      <p>Total Revenue</p>
+      <span class="growth" [ngClass]="getGrowthClass(adminStats.revenueGrowth)">
+        <i [ngClass]="getGrowthIcon(adminStats.revenueGrowth)"></i>
+        {{adminStats.revenueGrowth}}%
+      </span>
+    </div>
+  </div>
+</div>
 
- <!-- Actions principales -->
- <div class="main-actions">
-   <div class="section-header">
-     <h2>Actions Principales</h2>
-   </div>
+<!-- System Metrics -->
+<div class="system-metrics">
+  <div class="section-header">
+    <h2>System Status</h2>
+  </div>
 
-   <div class="actions-grid">
-     <button class="action-card primary" (click)="navigateToAddProduct()">
-       <i class="icon-plus"></i>
-       <h3>Ajouter Produit</h3>
-       <p>Ajouter un nouveau produit à votre catalogue</p>
-     </button>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon">
+        <i class="icon-cpu"></i>
+      </div>
+      <div class="metric-content">
+        <h4>System Load</h4>
+        <div class="metric-value">{{systemMetrics.systemLoad}}%</div>
+        <div class="metric-bar">
+          <div class="metric-progress" [style.width.%]="systemMetrics.systemLoad"></div>
+        </div>
+      </div>
+    </div>
 
-     <a routerLink="/vendeur/products" class="action-card">
-       <i class="icon-manage"></i>
-       <h3>Gérer Produits</h3>
-       <p>Voir et modifier vos produits</p>
-     </a>
+    <div class="metric-card">
+      <div class="metric-icon">
+        <i class="icon-database"></i>
+      </div>
+      <div class="metric-content">
+        <h4>Database Health</h4>
+        <div class="metric-value">{{systemMetrics.databaseHealth}}%</div>
+        <div class="metric-bar">
+          <div class="metric-progress success" [style.width.%]="systemMetrics.databaseHealth"></div>
+        </div>
+      </div>
+    </div>
 
-     <div class="action-card disabled">
-       <i class="icon-analytics"></i>
-       <h3>Voir Ventes</h3>
-       <p>Suivre vos statistiques de vente</p>
-       <span class="badge-coming">Bientôt</span>
-     </div>
+    <div class="metric-card">
+      <div class="metric-icon">
+        <i class="icon-clock"></i>
+      </div>
+      <div class="metric-content">
+        <h4>Uptime</h4>
+        <div class="metric-value">{{systemMetrics.uptime}}</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-     <div class="action-card disabled">
-       <i class="icon-inventory"></i>
-       <h3>Inventaire</h3>
-       <p>Gérer votre stock</p>
-       <span class="badge-coming">Bientôt</span>
-     </div>
-   </div>
- </div>
+<!-- Recent Activities and Alerts -->
+<div class="activities-alerts-grid">
+  <!-- Recent Activities -->
+  <div class="activities-section">
+    <div class="section-header">
+      <h2>Recent Activities</h2>
+      <a href="#" class="link">View All</a>
+    </div>
 
- <!-- Produits récents -->
- <div class="recent-products">
-   <div class="section-header">
-     <h2>Vos Derniers Produits</h2>
-     <a routerLink="/vendeur/products" class="btn btn-primary">Voir Tous</a>
-   </div>
+    <div class="activities-list">
+      <div class="activity-item" *ngFor="let activity of recentActivities" [ngClass]="'activity-' + activity.type">
+        <div class="activity-icon">
+          <i [class]="activity.icon"></i>
+        </div>
+        <div class="activity-content">
+          <p>{{activity.message}}</p>
+          <span class="activity-time">{{activity.time}}</span>
+        </div>
+        <div class="activity-action" *ngIf="activity.action">
+          <button class="btn btn-sm">View</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-   <div class="products-grid">
-     <div class="product-card" *ngFor="let product of recentProducts">
-       <div class="product-image">
-         <img [src]="product.images[0] || 'assets/images/no-image.png'" [alt]="product.name">
-       </div>
-       <div class="product-info">
-         <h4>{{product.name}}</h4>
-         <p class="product-price">{{product.price | currency:'XAF':'symbol':'1.0-0'}}</p>
-         <p class="product-stock">Stock: {{product.stock}}</p>
-         <div class="product-status" [ngClass]="getStatusClass(product.status)">
-           <span>{{getStatusLabel(product.status)}}</span>
-         </div>
-       </div>
-       <div class="product-actions">
-         <button class="btn btn-primary btn-sm">Modifier</button>
-         <button class="btn btn-secondary btn-sm">Voir</button>
-       </div>
-     </div>
-   </div>
- </div>
+  <!-- System Alerts -->
+  <div class="alerts-section">
+    <div class="section-header">
+      <h2>System Alerts</h2>
+      <a href="#" class="link">Manage</a>
+    </div>
 
- <!-- Message si aucun produit -->
- <div class="no-products" *ngIf="recentProducts.length === 0">
-   <i class="icon-plus-circle"></i>
-   <h3>Commencez par ajouter votre premier produit</h3>
-   <p>Ajoutez des produits pour commencer à vendre sur la plateforme.</p>
-   <button class="btn btn-primary" (click)="navigateToAddProduct()">Ajouter un Produit</button>
- </div>
+    <div class="alerts-list">
+      <div class="alert-item" *ngFor="let alert of systemAlerts" [ngClass]="'alert-' + alert.type">
+        <div class="alert-icon">
+          <i [class]="alert.icon"></i>
+        </div>
+        <div class="alert-content">
+          <h4>{{alert.title}}</h4>
+          <p>{{alert.message}}</p>
+          <span class="alert-time">{{alert.time}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>

@@ -1,6 +1,23 @@
-<div class="vendeur-dashboard">
- 
 
+
+<div class="vendeur-dashboard">
+  <!-- Statistics Cards Section -->
+ 
+ 
+ <!-- Confirmation Modal for Product Deletion -->
+ <app-confirmation-modal
+   [isVisible]="showDeleteModal"
+   title="Confirmation de suppression"
+   message="Êtes-vous sûr de vouloir supprimer ce produit ?"
+   confirmButtonText="Supprimer"
+   cancelButtonText="Annuler"
+   [isDestructive]="true"
+   (confirmed)="confirmDeleteProduct()"
+   (cancelled)="cancelDeleteProduct()"
+   (closed)="closeDeleteModal()">
+ </app-confirmation-modal>
+
+  <!-- Products Section -->
   <div class="products-section">
     <div class="section-header">
       <h2>Mes Produits</h2>
@@ -45,32 +62,50 @@
         <p>Aucun produit trouvé pour ce filtre.</p>
       </div>
 
-      <div *ngFor="let product of filteredProducts" class="product-card">
-        <div class="product-image">
-          <img [src]="product.images[0] || '/assets/images/no-image.png'"
-               [alt]="product.name"
-               onerror="this.src='/assets/images/no-image.png'">
-        </div>
-
-        <div class="product-info">
-          <h3>{{ product.name }}</h3>
-          <p class="product-description">{{ product.description }}</p>
-          <p class="product-price">{{ product.price | currency:'XOF':'symbol':'1.0-0' }}</p>
-          <p class="product-stock">Stock: {{ product.stock }}</p>
-
-          <div class="product-status">
-            <span [class]="getStatusClass(product.status)">
-              {{ getStatusLabel(product.status) }}
-            </span>
+      <div class="products-container">
+        <div *ngFor="let product of filteredProducts" class="product-card">
+          <!-- Category Badge -->
+          <div class="product-badge" [class]="'badge-' + getCategoryClass(product.category)">
+            {{ product.stock <= 5 && product.status === 'approved' ? product.stock + ' RESTANT' : product.category.toUpperCase() }}
           </div>
 
-          <div class="product-actions">
-            <button class="btn-edit" (click)="editProduct(product.id ? +product.id : undefined)">
-              Modifier
-            </button>
-            <button class="btn-delete" (click)="deleteProduct(product.id ? +product.id : undefined)">
-              Supprimer
-            </button>
+          <div class="product-image">
+            <img [src]="product.images[0] || '/assets/images/no-image.png'"
+                 [alt]="product.name"
+                 onerror="this.src='/assets/images/no-image.png'">
+          </div>
+
+          <div class="product-content">
+            <div class="product-header">
+              <h3 class="product-title">{{ product.name }}</h3>
+              <div class="product-status-badge" [class]="'status-' + product.status">
+                {{ getStatusLabel(product.status) }}
+              </div>
+            </div>
+
+            <p class="product-description">{{ product.description }}</p>
+
+            <div class="product-details">
+              <div class="product-price-stock">
+                <p class="product-price">{{ product.price | currency:'XOF':'symbol':'1.0-0' }}</p>
+                <p class="product-stock">{{ product.stock }} unités</p>
+              </div>
+            </div>
+
+            <div class="product-actions">
+              <button class="btn-action btn-edit" (click)="editProduct(product.id ? +product.id : undefined)">
+                <i class="icon-edit"></i>
+                Modifier
+              </button>
+              <button class="btn-action btn-stats" (click)="showProductStats(product)">
+                <i class="icon-stats"></i>
+                Stats
+              </button>
+              <button class="btn-action btn-delete" (click)="deleteProduct(product.id ? +product.id : undefined)">
+                <i class="icon-delete"></i>
+                Supprir
+              </button>
+            </div>
           </div>
         </div>
       </div>

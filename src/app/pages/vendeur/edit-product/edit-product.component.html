@@ -1,0 +1,174 @@
+<div class="edit-product-container">
+  <div class="page-header">
+    <h1>Modifier le Produit</h1>
+    <p>Modifiez les informations de votre produit</p>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <p>Chargement du produit...</p>
+  </div>
+
+  <div *ngIf="!isLoading && !canEditProduct()" class="error-container">
+    <p>Vous n'avez pas l'autorisation de modifier ce produit.</p>
+    <button class="btn-secondary" (click)="navigateBack()">Retour</button>
+  </div>
+
+  <form *ngIf="!isLoading && canEditProduct()" [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+
+    <!-- Informations générales -->
+    <div class="form-section">
+      <h2>Informations générales</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Nom du produit *</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            [class.invalid]="isFieldInvalid('name')"
+            placeholder="Entrez le nom du produit">
+          <div *ngIf="isFieldInvalid('name')" class="error-message">
+            {{ getFieldError('name') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Catégorie *</label>
+          <select
+            id="category"
+            formControlName="category"
+            [class.invalid]="isFieldInvalid('category')">
+            <option value="">Sélectionnez une catégorie</option>
+            <option *ngFor="let category of categories" [value]="category.name">
+              {{ category.name }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('category')" class="error-message">
+            {{ getFieldError('category') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          [class.invalid]="isFieldInvalid('description')"
+          placeholder="Décrivez votre produit en détail..."
+          rows="4"></textarea>
+        <div *ngIf="isFieldInvalid('description')" class="error-message">
+          {{ getFieldError('description') }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="price">Prix (FCFA) *</label>
+          <input
+            type="number"
+            id="price"
+            formControlName="price"
+            [class.invalid]="isFieldInvalid('price')"
+            placeholder="0"
+            min="0"
+            step="0.01">
+          <div *ngIf="isFieldInvalid('price')" class="error-message">
+            {{ getFieldError('price') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="stock">Stock *</label>
+          <input
+            type="number"
+            id="stock"
+            formControlName="stock"
+            [class.invalid]="isFieldInvalid('stock')"
+            placeholder="0"
+            min="0">
+          <div *ngIf="isFieldInvalid('stock')" class="error-message">
+            {{ getFieldError('stock') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Images -->
+    <div class="form-section">
+      <h2>Images du produit</h2>
+      <p class="section-description">Ajoutez jusqu'à 3 images pour votre produit</p>
+
+      <div class="images-upload-container">
+        <div class="selected-images">
+          <div *ngFor="let image of selectedImages; let i = index" class="image-item">
+            <img [src]="image" [alt]="'Image ' + (i + 1)">
+            <button type="button" class="remove-image-btn" (click)="removeImage(i)">
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="selectedImages.length < 3" class="image-upload-options">
+          <div class="upload-option">
+            <label for="file-upload" class="upload-btn">
+              <i class="icon-upload"></i>
+              Choisir des fichiers
+            </label>
+            <input
+              type="file"
+              id="file-upload"
+              accept="image/*"
+              multiple
+              (change)="onImageSelected($event)"
+              style="display: none">
+          </div>
+
+          <div class="divider">
+            <span>ou</span>
+          </div>
+
+          <div class="upload-option">
+            <button
+              type="button"
+              class="camera-btn"
+              (click)="openCamera()"
+              [disabled]="!isCameraAvailable()">
+              <i class="icon-camera"></i>
+              Prendre une photo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prévisualisation caméra -->
+    <div *ngIf="showCameraPreview" class="camera-modal">
+      <div class="camera-container">
+        <video id="cameraVideo" autoplay playsinline></video>
+        <div class="camera-controls">
+          <button type="button" class="capture-btn" (click)="captureImage()">
+            <i class="icon-capture"></i>
+          </button>
+          <button type="button" class="close-camera-btn" (click)="closeCamera()">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="navigateBack()">
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="isSubmitting || !productForm.valid">
+        {{ isSubmitting ? 'Modification en cours...' : 'Modifier le produit' }}
+      </button>
+    </div>
+  </form>
+</div>

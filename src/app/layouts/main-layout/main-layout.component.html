@@ -1,9 +1,9 @@
 <div class="main-layout">
   <app-navbar></app-navbar>
   <div class="content-wrapper">
-    <app-sidebar></app-sidebar>
+    <app-sidebar (categorySelected)="onCategorySelected($event)"></app-sidebar>
     <main class="main-content">
-      <app-produits></app-produits>
+      <app-produits [selectedCategories]="selectedCategories"></app-produits>
       <router-outlet></router-outlet>
     </main>
   </div>

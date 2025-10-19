@@ -27,9 +27,8 @@
                     formControlName="nom"
                     placeholder="Entrez le nom du produit"
                     [class.is-invalid]="nom?.invalid && nom?.touched">
-                  <div class="invalid-feedback" *ngIf="nom?.invalid && nom?.touched">
-                    <span *ngIf="nom?.errors?.['required']">Le nom est obligatoire.</span>
-                    <span *ngIf="nom?.errors?.['minlength']">Le nom doit contenir au moins 2 caractères.</span>
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('nom')">
+                    {{getFieldError('nom')}}
                   </div>
                 </div>
 
@@ -44,9 +43,8 @@
                     placeholder="Décrivez votre produit en détail..."
                     [class.is-invalid]="description?.invalid && description?.touched">
                   </textarea>
-                  <div class="invalid-feedback" *ngIf="description?.invalid && description?.touched">
-                    <span *ngIf="description?.errors?.['required']">La description est obligatoire.</span>
-                    <span *ngIf="description?.errors?.['minlength']">La description doit contenir au moins 10 caractères.</span>
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('description')">
+                    {{getFieldError('description')}}
                   </div>
                 </div>
 
@@ -64,9 +62,8 @@
                         min="0"
                         step="0.01"
                         [class.is-invalid]="prix?.invalid && prix?.touched">
-                      <div class="invalid-feedback" *ngIf="prix?.invalid && prix?.touched">
-                        <span *ngIf="prix?.errors?.['required']">Le prix est obligatoire.</span>
-                        <span *ngIf="prix?.errors?.['min']">Le prix doit être positif.</span>
+                      <div class="invalid-feedback" *ngIf="isFieldInvalid('prix')">
+                        {{getFieldError('prix')}}
                       </div>
                     </div>
                   </div>
@@ -82,9 +79,8 @@
                         placeholder="0"
                         min="0"
                         [class.is-invalid]="stock?.invalid && stock?.touched">
-                      <div class="invalid-feedback" *ngIf="stock?.invalid && stock?.touched">
-                        <span *ngIf="stock?.errors?.['required']">Le stock est obligatoire.</span>
-                        <span *ngIf="stock?.errors?.['min']">Le stock ne peut pas être négatif.</span>
+                      <div class="invalid-feedback" *ngIf="isFieldInvalid('stock')">
+                        {{getFieldError('stock')}}
                       </div>
                     </div>
                   </div>
@@ -103,8 +99,8 @@
                       {{ cat.name }}
                     </option>
                   </select>
-                  <div class="invalid-feedback" *ngIf="categorie?.invalid && categorie?.touched">
-                    La catégorie est obligatoire.
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('categorie')">
+                    {{getFieldError('categorie')}}
                   </div>
                 </div>
               </div>

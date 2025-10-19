@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
+import { Observable, of, BehaviorSubject, from } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { UserRole } from '../models/user.model';
+import { DataService } from './data.service';
+import { Category } from '../models/category.model';
 
 // Interfaces pour les données admin
 export interface AdminStats {
@@ -73,7 +75,7 @@ export class AdminService {
   public alerts$ = this.alertsSubject.asObservable();
   public metrics$ = this.metricsSubject.asObservable();
 
-  constructor(private apiService: ApiService) {
+  constructor(private apiService: ApiService, private dataService: DataService) {
     // Démarrer les mises à jour automatiques
     this.startPeriodicUpdates();
   }
@@ -359,5 +361,19 @@ export class AdminService {
   exportClients(format: 'csv' | 'excel' = 'csv'): Observable<Blob> {
     return this.apiService.get(`${this.baseUrl}/clients/export?format=${format}`)
       .pipe(map(response => new Blob([response as any])));
+  }
+
+  // Méthode pour ajouter une catégorie
+  addCategory(category: Category): Observable<any> {
+    return new Observable(observer => {
+      this.dataService.addCategory(category)
+        .then(result => {
+          observer.next(result);
+          observer.complete();
+        })
+        .catch(error => {
+          observer.error(error);
+        });
+    });
   }
 }

@@ -61,6 +61,27 @@
           <span class="vendeur">{{ getVendeurInfo(produit.sellerId) }}</span>
           <span class="date">{{ produit.createdAt ? formatDate(produit.createdAt) : 'N/A' }}</span>
         </div>
+
+        <!-- Informations de validation IA -->
+        <div class="ai-validation-info" *ngIf="produit.aiValidationStatus">
+          <div class="ai-status-badge" [ngClass]="getAIValidationStatusClass(produit)">
+            <span class="status-icon">
+              <i class="fa-solid" [class]="produit.aiValidationStatus === 'approved' ? 'fa-check-circle' :
+                                         produit.aiValidationStatus === 'rejected' ? 'fa-exclamation-triangle' :
+                                         produit.aiValidationStatus === 'pending' ? 'fa-clock' : 'fa-exclamation-circle'"></i>
+            </span>
+            <span class="status-text">{{ getAIValidationStatusText(produit) }}</span>
+          </div>
+
+          <div class="ai-details" *ngIf="produit.aiValidationStatus === 'rejected' || produit.aiValidationStatus === 'error'">
+            <small class="ai-reason" *ngIf="produit.aiValidationReason">
+              Raison: {{ getAIRejectionReason(produit) }}
+            </small>
+            <small class="ai-confidence" *ngIf="produit.aiValidationConfidence">
+              {{ getAIConfidenceText(produit) }}
+            </small>
+          </div>
+        </div>
       </div>
 
       <div class="product-actions">
@@ -68,15 +89,34 @@
           type="button"
           class="btn-approve"
           (click)="approuverProduit(produit)"
-          title="Approuver le produit">
+          title="Approuver le produit"
+          [disabled]="needsAdminAttention(produit)">
           ✅ Approuver
         </button>
+
+        <button
+          *ngIf="produit.aiValidationStatus === 'rejected'"
+          type="button"
+          class="btn-approve-force"
+          (click)="approuverProduitForce(produit)"
+          title="Approuver malgré la validation IA">
+          ⚠️ Approuver quand même
+        </button>
+
         <button
           type="button"
           class="btn-reject"
           (click)="rejeterProduit(produit)"
           title="Rejeter le produit">
           ❌ Rejeter
+        </button>
+
+        <button
+          type="button"
+          class="btn-edit"
+          (click)="modifierProduit(produit)"
+          title="Modifier le produit">
+          ✏️ Modifier
         </button>
       </div>
     </div>

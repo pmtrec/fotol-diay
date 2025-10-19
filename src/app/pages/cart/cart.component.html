@@ -17,6 +17,9 @@
           <h3>{{ item.product.name }}</h3>
           <p class="description">{{ item.product.description }}</p>
           <p class="price">{{ item.product.price | currency:'XAF':'symbol':'1.0-0' }}</p>
+          <div class="vendeur-info">
+            <small class="vendeur-name">{{ getSellerDisplayName(item.product.sellerId) }}</small>
+          </div>
         </div>
 
         <div class="item-quantity">
@@ -30,7 +33,16 @@
 
         <div class="item-total">
           <p class="total-price">{{ getTotalForItem(item) | currency:'XAF':'symbol':'1.0-0' }}</p>
-          <button (click)="removeFromCart(item.product.id)" class="remove-btn">Supprimer</button>
+          <div class="item-actions">
+            <button (click)="removeFromCart(item.product.id)" class="remove-btn">Supprimer</button>
+            <button
+              *ngIf="getSellerInfo(item.product.sellerId)?.whatsapp || getSellerInfo(item.product.sellerId)?.phone"
+              (click)="contactSeller(item.product.sellerId)"
+              class="contact-btn">
+              <i class="fab fa-whatsapp"></i>
+              Contacter
+            </button>
+          </div>
         </div>
       </div>
     </div>

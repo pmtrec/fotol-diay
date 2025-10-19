@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { UserRole } from '../../core/models/user.model';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -15,20 +17,49 @@ export class RegisterComponent {
   email = '';
   password = '';
   confirmPassword = '';
+  selectedRole: UserRole = UserRole.CUSTOMER;
+  passwordError = '';
+  registrationError = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
-  onSubmit() {
-    // TODO: Implement register logic
+  async onSubmit() {
+    // Reset errors
+    this.passwordError = '';
+    this.registrationError = '';
+
+    // Validate passwords match
     if (this.password !== this.confirmPassword) {
-      console.error('Passwords do not match');
+      this.passwordError = 'Passwords do not match';
       return;
     }
-    console.log('Registration attempt:', {
-      username: this.username,
-      email: this.email,
-      password: this.password
-    });
+
+    // Validate role selection
+    if (!this.selectedRole) {
+      this.registrationError = 'Please select an account type';
+      return;
+    }
+
+    try {
+      const user = await this.authService.register({
+        username: this.username,
+        email: this.email,
+        password: this.password,
+        role: this.selectedRole
+      });
+
+      console.log('Registration successful:', user);
+
+      // Redirect to appropriate dashboard based on role
+      if (this.selectedRole === UserRole.SELLER) {
+        this.router.navigate(['/vendeur/dashboard']);
+      } else {
+        this.router.navigate(['/client/dashboard']);
+      }
+    } catch (error: any) {
+      console.error('Registration failed:', error);
+      this.registrationError = error.message || 'Registration failed. Please try again.';
+    }
   }
 
   goToLogin() {

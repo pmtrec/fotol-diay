@@ -1,1 +1,5 @@
 <router-outlet />
+<app-toast-notification
+  [toasts]="toasts"
+  (toastClosed)="onToastClosed($event)">
+</app-toast-notification>

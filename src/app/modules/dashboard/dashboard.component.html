@@ -1,5 +1,177 @@
 <div class="dashboard">
-  <h2>Dashboard</h2>
-  <p>Welcome to your dashboard!</p>
-  <!-- Add dashboard content here -->
+  <!-- Welcome Section -->
+  <section class="welcome-section">
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <h1>Bienvenue sur notre plateforme</h1>
+        <p>Découvrez des milliers de produits de qualité</p>
+      </div>
+      <div class="contact-section">
+        <button class="contact-btn">
+          <i class="fa-solid fa-message"></i>
+          Contacter
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Statistics Section -->
+  <section class="stats-section">
+    <h2>Nos Chiffres Clés</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-box"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ stats.productsAvailable }}</span>
+          <span class="stat-label">Produits Disponibles</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-store"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ stats.activeSellers }}</span>
+          <span class="stat-label">Vendeurs Actifs</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ stats.satisfiedCustomers }}</span>
+          <span class="stat-label">Clients Satisfaits</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fa-solid fa-shopping-cart"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-number">{{ stats.ordersProcessed }}</span>
+          <span class="stat-label">Commandes Traités</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Categories Section -->
+  <section class="categories-section">
+    <h2>Catégories Populaires</h2>
+    <div class="categories-grid">
+      <div class="category-card" *ngFor="let category of popularCategories">
+        <div class="category-icon">
+          <i [class]="category.icon"></i>
+        </div>
+        <div class="category-info">
+          <h3>{{ category.name }}</h3>
+          <p>{{ category.productCount }} produits</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="featured-products-section">
+    <div class="section-header">
+      <h2>Produits en Vedette</h2>
+      <button class="view-all-btn">Voir Tous</button>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="loading-spinner">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Chargement des produits...</p>
+      </div>
+    </div>
+
+    <div class="featured-products-grid" *ngIf="!isLoading && featuredProducts.length > 0">
+      <div class="featured-product-card" *ngFor="let product of featuredProducts">
+        <div class="product-image">
+          <img [src]="product.images[0] || 'assets/images/no-image.png'"
+               [alt]="product.name"
+               (error)="$event.target.src='assets/images/no-image.png'">
+          <div class="product-badge" *ngIf="product.status === 'approved'">
+            Nouveau
+          </div>
+        </div>
+        <div class="product-info">
+          <h3>{{ product.name }}</h3>
+          <div class="product-price">{{ formatPrice(product.price) }}</div>
+          <div class="product-rating">
+            <div class="stars">
+              <i class="fa-solid fa-star" *ngFor="let star of [1,2,3,4,5]"></i>
+            </div>
+            <span class="rating-count">({{ product.views || 0 }} avis)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && featuredProducts.length === 0">
+      <p>Aucun produit en vedette disponible pour le moment.</p>
+    </div>
+  </section>
+
+  <!-- Customer Testimonials Section -->
+  <section class="testimonials-section">
+    <h2>Ce que disent nos clients</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card" *ngFor="let testimonial of testimonials">
+        <div class="testimonial-content">
+          <p>"{{ testimonial.message }}"</p>
+        </div>
+        <div class="testimonial-author">
+          <div class="author-info">
+            <strong>{{ testimonial.name }}</strong>
+            <span>{{ testimonial.location }}</span>
+          </div>
+          <div class="author-rating">
+            <i class="fa-solid fa-star" *ngFor="let star of [1,2,3,4,5]"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Student Section -->
+  <section class="student-section">
+    <div class="student-content">
+      <h2>Étudiants</h2>
+      <p>Découvrez nos offres spéciales pour étudiants</p>
+      <button class="student-btn">En savoir plus</button>
+    </div>
+  </section>
+
+  <!-- Sports & Loisirs Section -->
+  <section class="sports-section">
+    <div class="sports-header">
+      <h2>Sports & Loisirs</h2>
+      <p>Découvrez notre collection d'équipements sportifs</p>
+    </div>
+    <div class="sports-categories">
+      <div class="sports-category">
+        <h3>Football</h3>
+        <p>Ballons, maillots et équipements</p>
+      </div>
+      <div class="sports-category">
+        <h3>Basketball</h3>
+        <p>Paniers et ballons de basketball</p>
+      </div>
+      <div class="sports-category">
+        <h3>Tennis</h3>
+        <p>Raquettes et balles de tennis</p>
+      </div>
+      <div class="sports-category">
+        <h3>Fitness</h3>
+        <p>Équipements de musculation et cardio</p>
+      </div>
+    </div>
+  </section>
 </div>

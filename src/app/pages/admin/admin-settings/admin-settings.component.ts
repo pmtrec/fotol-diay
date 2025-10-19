@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { ProductService } from '../../../core/services/product.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { Category } from '../../../core/models/category.model';
+import { NotificationType, NotificationPriority, NotificationCategory } from '../../../core/models/notification.model';
 
 @Component({
   selector: 'app-admin-settings',
@@ -30,7 +32,8 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private productService: ProductService
+    private productService: ProductService,
+    private notificationService: NotificationService
   ) {
     this.categoryForm = this.createCategoryForm();
     this.systemForm = this.createSystemForm();
@@ -138,7 +141,15 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
             },
             error: (error) => {
               console.error('Erreur lors de la mise à jour de la catégorie:', error);
-              alert('Erreur lors de la mise à jour de la catégorie. Veuillez réessayer.');
+              this.notificationService.createNotification({
+                userId: '1', // TODO: Get current user ID
+                type: NotificationType.SECURITY_ALERT,
+                title: 'Erreur de mise à jour',
+                message: 'Erreur lors de la mise à jour de la catégorie. Veuillez réessayer.',
+                read: false,
+                priority: NotificationPriority.NORMAL,
+                category: NotificationCategory.SYSTEM
+              }).subscribe();
               this.isLoading = false;
             }
           });
@@ -154,7 +165,15 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
             },
             error: (error) => {
               console.error('Erreur lors de la création de la catégorie:', error);
-              alert('Erreur lors de la création de la catégorie. Veuillez réessayer.');
+              this.notificationService.createNotification({
+                userId: '1', // TODO: Get current user ID
+                type: NotificationType.SECURITY_ALERT,
+                title: 'Erreur de création',
+                message: 'Erreur lors de la création de la catégorie. Veuillez réessayer.',
+                read: false,
+                priority: NotificationPriority.NORMAL,
+                category: NotificationCategory.SYSTEM
+              }).subscribe();
               this.isLoading = false;
             }
           });
@@ -177,7 +196,15 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Erreur lors de la suppression de la catégorie:', error);
-            alert('Erreur lors de la suppression de la catégorie. Veuillez réessayer.');
+            this.notificationService.createNotification({
+              userId: '1', // TODO: Get current user ID
+              type: NotificationType.SECURITY_ALERT,
+              title: 'Erreur de suppression',
+              message: 'Erreur lors de la suppression de la catégorie. Veuillez réessayer.',
+              read: false,
+              priority: NotificationPriority.NORMAL,
+              category: NotificationCategory.SYSTEM
+            }).subscribe();
             this.isLoading = false;
           }
         });
@@ -196,7 +223,15 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Erreur lors de la mise à jour du statut de la catégorie:', error);
-          alert('Erreur lors de la mise à jour du statut. Veuillez réessayer.');
+          this.notificationService.createNotification({
+            userId: '1', // TODO: Get current user ID
+            type: NotificationType.SECURITY_ALERT,
+            title: 'Erreur de mise à jour',
+            message: 'Erreur lors de la mise à jour du statut. Veuillez réessayer.',
+            read: false,
+            priority: NotificationPriority.NORMAL,
+            category: NotificationCategory.SYSTEM
+          }).subscribe();
         }
       });
   }
@@ -205,7 +240,15 @@ export class AdminSettingsComponent implements OnInit, OnDestroy {
   saveSystemSettings(): void {
     if (this.systemForm.valid) {
       // Here you would typically save to backend
-      alert('Paramètres système sauvegardés avec succès!');
+      this.notificationService.createNotification({
+        userId: '1', // TODO: Get current user ID
+        type: NotificationType.SYSTEM_UPDATE,
+        title: 'Paramètres sauvegardés',
+        message: 'Paramètres système sauvegardés avec succès!',
+        read: false,
+        priority: NotificationPriority.NORMAL,
+        category: NotificationCategory.SYSTEM
+      }).subscribe();
       console.log('System settings:', this.systemForm.value);
     } else {
       this.markFormGroupTouched();

@@ -6,6 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ProductService } from '../../../core/services/product.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ImageUploadService } from '../../../core/services/image-upload.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { Category } from '../../../core/models/category.model';
 import { ProductStatus } from '../../../core/models/product.model';
 
@@ -33,6 +34,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
     private productService: ProductService,
     private authService: AuthService,
     private imageUploadService: ImageUploadService,
+    private notificationService: NotificationService,
     private router: Router
   ) {
     this.productForm = this.createForm();
@@ -95,7 +97,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
 
       const currentUser = this.authService.getCurrentUser();
       if (!currentUser) {
-        alert('Utilisateur non connecté');
+        this.notificationService.showNotification('Utilisateur non connecté', 'error');
         return;
       }
 
@@ -107,19 +109,26 @@ export class AddProductComponent implements OnInit, OnDestroy {
         category: formValue.category,
         stock: formValue.stock,
         sellerId: currentUser.id,
-        images: this.selectedImages
+        images: this.selectedImages,
+        status: formValue.status || ProductStatus.PENDING
       };
 
       this.productService.addProduct(newProduct)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (product) => {
-            alert('Produit ajouté avec succès ! Il sera visible après validation par l\'administrateur.');
+            this.notificationService.showNotification(
+              'Produit ajouté avec succès ! Il sera visible après validation par l\'administrateur.',
+              'success'
+            );
             this.router.navigate(['/vendeur/products']);
           },
           error: (error) => {
             console.error('Erreur lors de l\'ajout du produit:', error);
-            alert('Erreur lors de l\'ajout du produit. Veuillez réessayer.');
+            this.notificationService.showNotification(
+              'Erreur lors de l\'ajout du produit. Veuillez réessayer.',
+              'error'
+            );
             this.isSubmitting = false;
           }
         });
@@ -159,7 +168,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
    */
   async openCamera(): Promise<void> {
     if (this.selectedImages.length >= 3) {
-      alert('Vous ne pouvez ajouter que 3 images maximum');
+      this.notificationService.showNotification('Vous ne pouvez ajouter que 3 images maximum', 'warning');
       return;
     }
 
@@ -173,7 +182,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
       }, 0);
     } catch (error) {
       console.error('Erreur lors de l\'ouverture de la caméra:', error);
-      alert(`Erreur: ${error}`);
+      this.notificationService.showNotification(`Erreur: ${error}`, 'error');
     }
   }
 
@@ -193,7 +202,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
    */
   async captureImage(): Promise<void> {
     if (!this.videoElement) {
-      alert('Erreur: élément vidéo non trouvé');
+      this.notificationService.showNotification('Erreur: élément vidéo non trouvé', 'error');
       return;
     }
 
@@ -207,7 +216,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
       this.closeCamera();
     } catch (error) {
       console.error('Erreur lors de la capture:', error);
-      alert(`Erreur lors de la capture: ${error}`);
+      this.notificationService.showNotification(`Erreur lors de la capture: ${error}`, 'error');
     }
   }
 

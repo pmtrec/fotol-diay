@@ -11,5 +11,11 @@ export const environment = {
   timeouts: {
     apiRequest: 45000, // Longer timeout in production
     fileUpload: 120000
-  }
+  },
+  cloudinary: {
+    cloudName: 'dx9vm7abv',
+    uploadPreset: 'unsigned_preset'
+  },
+  supabaseUrl: '${SUPABASE_URL}',
+  supabaseAnonKey: '${SUPABASE_ANON_KEY}'
 };

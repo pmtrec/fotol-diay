@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ProductService, Produit } from '../../../../core/services/product.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-mes-produits',
@@ -21,12 +22,16 @@ export class MesProduitsComponent implements OnInit, OnDestroy {
   selectedProductForModal: Produit | null = null;
   filtreActif: 'tous' | 'pending' | 'approved' | 'rejected' = 'tous';
 
-  // Mock vendeur ID - à remplacer par le service d'authentification
-  vendeurId = 2;
+  // Get vendeur ID from logged-in user
+  get vendeurId(): string {
+    const currentUser = this.authService.getCurrentUser();
+    return currentUser?.role === 'seller' ? currentUser.id : '2'; // fallback to '2' if not seller
+  }
 
   constructor(
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {

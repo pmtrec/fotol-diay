@@ -2,39 +2,43 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { ProductService, Produit } from '../../../core/services/product.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { AdminService, AdminStats, SystemMetrics, DashboardActivity, SystemAlert } from '../../../core/services/admin.service';
 
 @Component({
-  selector: 'app-vendeur-dashboard',
+  selector: 'app-admin-dashboard',
   standalone: true,
   imports: [CommonModule, CurrencyPipe, RouterModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
 })
-export class VendeurDashboardComponent implements OnInit, OnDestroy {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  dashboardStats = {
+  // Données principales du dashboard
+  adminStats: AdminStats = {
+    totalUsers: 0,
+    monthlySales: 0,
     totalProducts: 0,
-    pendingProducts: 0,
-    approvedProducts: 0,
-    rejectedProducts: 0,
-    totalValue: 0,
-    lowStockProducts: 0
+    totalRevenue: 0,
+    userGrowth: 0,
+    salesGrowth: 0,
+    productGrowth: 0,
+    revenueGrowth: 0
   };
 
-  recentProducts: Produit[] = [];
-  currentUser: any;
+  systemMetrics: SystemMetrics = {
+    systemLoad: 0,
+    databaseHealth: 0,
+    uptime: '0j 0h 0m'
+  };
 
-  constructor(
-    private productService: ProductService,
-    private authService: AuthService
-  ) {}
+  recentActivities: DashboardActivity[] = [];
+  systemAlerts: SystemAlert[] = [];
+
+  constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
-    this.currentUser = this.authService.getCurrentUser();
-    this.loadDashboardData();
+    this.loadAllDashboardData();
   }
 
   ngOnDestroy(): void {
@@ -42,64 +46,49 @@ export class VendeurDashboardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private loadDashboardData(): void {
-    if (this.currentUser) {
-      // Charger les produits du vendeur
-      this.productService.getProductsByVendeur(this.currentUser.id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((products: Produit[]) => {
-          this.dashboardStats = {
-            totalProducts: products.length,
-            pendingProducts: products.filter(p => p.status === 'pending').length,
-            approvedProducts: products.filter(p => p.status === 'approved').length,
-            rejectedProducts: products.filter(p => p.status === 'rejected').length,
-            totalValue: this.calculateTotalValue(products),
-            lowStockProducts: this.calculateLowStockProducts(products)
-          };
+  private loadAllDashboardData(): void {
+    // Charger les statistiques principales
+    this.adminService.getDashboardStats()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(stats => {
+        this.adminStats = stats;
+      });
 
-          // Récupérer les 5 derniers produits
-          this.recentProducts = products
-            .sort((a: Produit, b: Produit) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime())
-            .slice(0, 5);
-        });
-    }
+    // Charger les métriques système
+    this.adminService.getSystemMetrics()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(metrics => {
+        this.systemMetrics = metrics;
+      });
+
+    // Charger les activités récentes
+    this.adminService.getRecentActivities()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(activities => {
+        this.recentActivities = activities;
+      });
+
+    // Charger les alertes système
+    this.adminService.getSystemAlerts()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(alerts => {
+        this.systemAlerts = alerts;
+      });
   }
 
-  private calculateTotalValue(products: Produit[]): number {
-    return products
-      .filter(p => p.status === 'approved')
-      .reduce((total, product) => total + (product.price * product.stock), 0);
+  refreshData(): void {
+    this.adminService.refreshAllData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.loadAllDashboardData();
+      });
   }
 
-  private calculateLowStockProducts(products: Produit[]): number {
-    return products.filter(p => p.stock <= 5 && p.status === 'approved').length;
+  getGrowthClass(growth: number): string {
+    return growth >= 0 ? 'positive' : 'negative';
   }
 
-  navigateToAddProduct(): void {
-    // Navigation vers l'ajout de produit
-    console.log('Navigation vers l\'ajout de produit');
-  }
-
-  navigateToProducts(): void {
-    // Navigation vers la gestion des produits
-    console.log('Navigation vers la gestion des produits');
-  }
-
-  getStatusLabel(statut: string): string {
-    switch (statut) {
-      case 'pending': return 'En Attente';
-      case 'approved': return 'Approuvé';
-      case 'rejected': return 'Rejeté';
-      default: return 'Inconnu';
-    }
-  }
-
-  getStatusClass(statut: string): string {
-    switch (statut) {
-      case 'pending': return 'pending';
-      case 'approved': return 'approved';
-      case 'rejected': return 'rejected';
-      default: return 'unknown';
-    }
+  getGrowthIcon(growth: number): string {
+    return growth >= 0 ? 'icon-arrow-up' : 'icon-arrow-down';
   }
 }

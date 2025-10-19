@@ -6,8 +6,10 @@ import { Subject, takeUntil } from 'rxjs';
 import { ProductService } from '../../../core/services/product.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ImageUploadService } from '../../../core/services/image-upload.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { LLMValidationService } from '../../../core/services/llm-validation.service';
 import { Category } from '../../../core/models/category.model';
-import { ProductStatus } from '../../../core/models/product.model';
+import { ProductStatus, AIValidationStatus } from '../../../core/models/product.model';
 
 @Component({
   selector: 'app-add-product',
@@ -21,6 +23,8 @@ export class AddProductComponent implements OnInit, OnDestroy {
   categories: Category[] = [];
   selectedImages: string[] = [];
   isSubmitting = false;
+  isValidating = false;
+  validationResult: any = null;
   private destroy$ = new Subject<void>();
 
   // Propriétés pour la caméra
@@ -38,6 +42,8 @@ export class AddProductComponent implements OnInit, OnDestroy {
     private productService: ProductService,
     private authService: AuthService,
     private imageUploadService: ImageUploadService,
+    private notificationService: NotificationService,
+    private llmValidationService: LLMValidationService,
     private router: Router
   ) {
     this.productForm = this.createForm();
@@ -90,14 +96,17 @@ export class AddProductComponent implements OnInit, OnDestroy {
         if (file && this.selectedImages.length < 3) {
           const currentUser = this.authService.getCurrentUser();
 
-          this.imageUploadService.uploadImage(file, currentUser?.id).subscribe({
+          this.imageUploadService.uploadImage(file, currentUser?.id || '').subscribe({
             next: (imageUrl) => {
               this.selectedImages.push(imageUrl);
               this.imagesFormArray.push(this.fb.control(imageUrl));
             },
             error: (error) => {
               console.error('Erreur lors de l\'upload de l\'image:', error);
-              alert(`Erreur lors de l'upload: ${error.message || error}`);
+              this.notificationService.showNotification(
+                `Erreur lors de l'upload: ${error.message || error}`,
+                'error'
+              );
             }
           });
         }
@@ -115,41 +124,158 @@ export class AddProductComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.productForm.valid && this.selectedImages.length > 0) {
-      this.isSubmitting = true;
-
-      const currentUser = this.authService.getCurrentUser();
-      if (!currentUser) {
-        alert('Utilisateur non connecté');
-        return;
-      }
-
-      const formValue = this.productForm.value;
-      const newProduct = {
-        name: formValue.name,
-        description: formValue.description,
-        price: formValue.price,
-        category: formValue.category,
-        stock: formValue.stock,
-        sellerId: currentUser.id,
-        images: this.selectedImages
-      };
-
-      this.productService.addProduct(newProduct)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (product) => {
-            alert('Produit ajouté avec succès ! Il sera visible après validation par l\'administrateur.');
-            this.router.navigate(['/vendeur/mes-produits']);
-          },
-          error: (error) => {
-            console.error('Erreur lors de l\'ajout du produit:', error);
-            alert('Erreur lors de l\'ajout du produit. Veuillez réessayer.');
-            this.isSubmitting = false;
-          }
-        });
+      // D'abord, valider le contenu avec l'IA
+      this.validateContentWithAI();
     } else {
       this.markFormGroupTouched();
     }
+  }
+
+  /**
+   * Valider le contenu avec l'IA avant soumission
+   */
+  private validateContentWithAI(): void {
+    this.isValidating = true;
+    this.validationResult = null;
+
+    const formValue = this.productForm.value;
+    const validationRequest = {
+      title: formValue.name,
+      description: formValue.description,
+      imageUrl: this.selectedImages.length > 0 ? this.selectedImages[0] : undefined
+    };
+
+    this.llmValidationService.validateContent(validationRequest)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result) => {
+          this.isValidating = false;
+          this.validationResult = result;
+
+          if (result.isAppropriate) {
+            // Le contenu est approprié, procéder à la soumission
+            this.submitProduct();
+          } else {
+            // Le contenu n'est pas approprié, bloquer la soumission
+            this.handleInappropriateContent(result);
+          }
+        },
+        error: (error) => {
+          this.isValidating = false;
+          console.error('Erreur lors de la validation:', error);
+          this.notificationService.showNotification(
+            'Erreur lors de la validation du contenu. Veuillez réessayer plus tard.',
+            'error'
+          );
+          // En cas d'erreur de validation, ne pas soumettre le produit
+          this.isSubmitting = false;
+        }
+      });
+  }
+
+  /**
+   * Gérer le contenu détecté comme inapproprié
+   */
+  private handleInappropriateContent(result: any): void {
+    // Bloquer complètement la soumission
+    this.isSubmitting = false;
+
+    // Afficher un message d'erreur détaillé
+    let errorMessage = 'Le produit ne peut pas être publié en raison de contenu inapproprié détecté.\n\n';
+
+    if (result.reason) {
+      errorMessage += `Raison: ${result.reason}\n`;
+    }
+
+    errorMessage += '\nVeuillez modifier votre titre et/ou description et réessayer.';
+
+    this.notificationService.showNotification(errorMessage, 'error');
+
+    // Mettre en surbrillance les champs problématiques
+    this.highlightInappropriateFields(result);
+  }
+
+  /**
+   * Mettre en surbrillance les champs qui contiennent du contenu inapproprié
+   */
+  private highlightInappropriateFields(result: any): void {
+    // Ajouter une classe CSS pour indiquer les champs problématiques
+    const titleField = document.getElementById('name');
+    const descriptionField = document.getElementById('description');
+
+    if (titleField) {
+      titleField.classList.add('inappropriate-content');
+    }
+
+    if (descriptionField) {
+      descriptionField.classList.add('inappropriate-content');
+    }
+
+    // Retirer la surbrillance après quelques secondes
+    setTimeout(() => {
+      if (titleField) {
+        titleField.classList.remove('inappropriate-content');
+      }
+      if (descriptionField) {
+        descriptionField.classList.remove('inappropriate-content');
+      }
+    }, 5000);
+  }
+
+  /**
+   * Soumettre le produit après validation réussie
+   */
+  private submitProduct(): void {
+    this.isSubmitting = true;
+
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      this.notificationService.showNotification('Utilisateur non connecté', 'error');
+      this.isSubmitting = false;
+      return;
+    }
+
+    const formValue = this.productForm.value;
+    const newProduct = {
+      name: formValue.name,
+      description: formValue.description,
+      price: formValue.price,
+      category: formValue.category,
+      stock: formValue.stock,
+      sellerId: currentUser.id,
+      images: this.selectedImages,
+      status: ProductStatus.PENDING,
+      // Ajouter les informations de validation IA
+      aiValidationStatus: this.validationResult?.isAppropriate ?
+        AIValidationStatus.APPROVED : AIValidationStatus.REJECTED,
+      aiValidationDate: new Date(),
+      aiValidationReason: this.validationResult?.reason,
+      aiValidationConfidence: this.validationResult?.confidence
+    };
+
+    this.productService.addProduct(newProduct)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (product) => {
+          let message = 'Produit ajouté avec succès !';
+          if (this.validationResult?.isAppropriate) {
+            message += ' Il sera visible après validation par l\'administrateur.';
+          } else {
+            message += ' Il nécessite une validation manuelle en raison du contenu détecté.';
+          }
+
+          this.notificationService.showNotification(message, 'success');
+          this.router.navigate(['/vendeur/mes-produits']);
+        },
+        error: (error) => {
+          console.error('Erreur lors de l\'ajout du produit:', error);
+          this.notificationService.showNotification(
+            'Erreur lors de l\'ajout du produit. Veuillez réessayer.',
+            'error'
+          );
+          this.isSubmitting = false;
+        }
+      });
   }
 
   private markFormGroupTouched(): void {
@@ -183,7 +309,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
    */
   async openCamera(): Promise<void> {
     if (this.selectedImages.length >= 3) {
-      alert('Vous ne pouvez ajouter que 3 images maximum');
+      this.notificationService.showNotification('Vous ne pouvez ajouter que 3 images maximum', 'warning');
       return;
     }
 
@@ -197,7 +323,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
       }, 0);
     } catch (error) {
       console.error('Erreur lors de l\'ouverture de la caméra:', error);
-      alert(`Erreur: ${error}`);
+      this.notificationService.showNotification(`Erreur: ${error}`, 'error');
     }
   }
 
@@ -217,13 +343,13 @@ export class AddProductComponent implements OnInit, OnDestroy {
    */
   async captureImage(): Promise<void> {
     if (!this.videoElement) {
-      alert('Erreur: élément vidéo non trouvé');
+      this.notificationService.showNotification('Erreur: élément vidéo non trouvé', 'error');
       return;
     }
 
     try {
       const currentUser = this.authService.getCurrentUser();
-      const imageUrl = await this.imageUploadService.captureFromVideoElement(this.videoElement, currentUser?.id);
+      const imageUrl = await this.imageUploadService.captureFromVideoElement(this.videoElement, currentUser?.id || '');
 
       this.selectedImages.push(imageUrl);
       this.imagesFormArray.push(this.fb.control(imageUrl));
@@ -231,7 +357,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
       this.closeCamera();
     } catch (error) {
       console.error('Erreur lors de la capture:', error);
-      alert(`Erreur lors de la capture: ${error}`);
+      this.notificationService.showNotification(`Erreur lors de la capture: ${error}`, 'error');
     }
   }
 
@@ -259,7 +385,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
    */
   async startPhotoReel(): Promise<void> {
     if (this.selectedImages.length >= 3) {
-      alert('Vous ne pouvez ajouter que 3 images maximum');
+      this.notificationService.showNotification('Vous ne pouvez ajouter que 3 images maximum', 'warning');
       return;
     }
 
@@ -271,7 +397,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
       await this.openCameraForReel();
     } catch (error) {
       console.error('Erreur lors du démarrage du mode reel:', error);
-      alert(`Erreur: ${error}`);
+      this.notificationService.showNotification(`Erreur: ${error}`, 'error');
       this.isCapturingReel = false;
     }
   }
@@ -308,13 +434,13 @@ export class AddProductComponent implements OnInit, OnDestroy {
    */
   async captureReelPhoto(): Promise<void> {
     if (!this.videoElement) {
-      alert('Erreur: élément vidéo non trouvé');
+      this.notificationService.showNotification('Erreur: élément vidéo non trouvé', 'error');
       return;
     }
 
     try {
       const currentUser = this.authService.getCurrentUser();
-      const imageUrl = await this.imageUploadService.captureFromVideoElement(this.videoElement, currentUser?.id);
+      const imageUrl = await this.imageUploadService.captureFromVideoElement(this.videoElement, currentUser?.id || '');
 
       this.reelPhotos.push(imageUrl);
       this.currentReelStep++;
@@ -329,7 +455,7 @@ export class AddProductComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Erreur lors de la capture reel:', error);
-      alert(`Erreur lors de la capture: ${error}`);
+      this.notificationService.showNotification(`Erreur lors de la capture: ${error}`, 'error');
     }
   }
 
@@ -363,7 +489,10 @@ export class AddProductComponent implements OnInit, OnDestroy {
     this.currentReelStep = 0;
 
     if (this.selectedImages.length > 0) {
-      alert(`Photos ajoutées avec succès! ${this.selectedImages.length} image(s) sélectionnée(s)`);
+      this.notificationService.showNotification(
+        `Photos ajoutées avec succès! ${this.selectedImages.length} image(s) sélectionnée(s)`,
+        'success'
+      );
     }
   }
 
@@ -382,19 +511,19 @@ export class AddProductComponent implements OnInit, OnDestroy {
    */
   async previewPhoto(): Promise<void> {
     if (!this.videoElement) {
-      alert('Erreur: élément vidéo non trouvé');
+      this.notificationService.showNotification('Erreur: élément vidéo non trouvé', 'error');
       return;
     }
 
     try {
       const currentUser = this.authService.getCurrentUser();
-      const imageUrl = await this.imageUploadService.captureFromVideoElement(this.videoElement, currentUser?.id);
+      const imageUrl = await this.imageUploadService.captureFromVideoElement(this.videoElement, currentUser?.id || '');
 
       this.previewImageUrl = imageUrl;
       this.showPhotoPreview = true;
     } catch (error) {
       console.error('Erreur lors de la prévisualisation:', error);
-      alert(`Erreur lors de la prévisualisation: ${error}`);
+      this.notificationService.showNotification(`Erreur lors de la prévisualisation: ${error}`, 'error');
     }
   }
 

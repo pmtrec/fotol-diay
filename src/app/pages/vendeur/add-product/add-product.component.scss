@@ -83,8 +83,14 @@
             }
 
             &.invalid {
-              border-color: #dc3545;
-            }
+               border-color: #dc3545;
+             }
+
+             &.inappropriate-content {
+               border-color: #dc3545 !important;
+               background-color: #fff5f5 !important;
+               animation: shake 0.5s ease-in-out;
+             }
           }
 
           textarea {
@@ -538,6 +544,112 @@
       }
     }
   }
+
+  // Section de validation IA
+  .ai-validation-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+
+    .validation-status {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .validation-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+
+        .icon {
+          font-size: 1.25rem;
+        }
+
+        h3 {
+          margin: 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+      }
+
+      .validation-details {
+        flex: 1;
+
+        p {
+          margin: 0 0 0.5rem 0;
+          color: #495057;
+          font-size: 0.9rem;
+          line-height: 1.4;
+
+          &.rejection-reason {
+            color: #dc3545;
+            font-weight: 500;
+          }
+        }
+
+        .validation-confidence {
+          margin-top: 0.5rem;
+
+          small {
+            color: #6c757d;
+            font-size: 0.8rem;
+          }
+        }
+      }
+
+      // États de validation
+      &.validating {
+        .validation-header {
+          .icon {
+            color: #007bff;
+          }
+
+          h3 {
+            color: #007bff;
+          }
+        }
+      }
+
+      &.approved {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+
+        .validation-header {
+          .icon {
+            color: #28a745;
+          }
+
+          h3 {
+            color: #155724;
+          }
+        }
+      }
+
+      &.rejected {
+        background: #f8d7da;
+        border-left: 4px solid #dc3545;
+
+        .validation-header {
+          .icon {
+            color: #dc3545;
+          }
+
+          h3 {
+            color: #721c24;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
 // Icônes

@@ -53,7 +53,7 @@ export class CartService {
     this.saveCartToStorage(updatedCart);
   }
 
-  removeFromCart(productId: number): void {
+  removeFromCart(productId: string): void {
     const currentCart = this.cartSubject.value;
     const updatedItems = currentCart.items.filter(item => item.product.id !== productId);
     const updatedCart = this.calculateCartTotals(updatedItems);
@@ -61,7 +61,7 @@ export class CartService {
     this.saveCartToStorage(updatedCart);
   }
 
-  updateQuantity(productId: number, quantity: number): void {
+  updateQuantity(productId: string, quantity: number): void {
     if (quantity <= 0) {
       this.removeFromCart(productId);
       return;

@@ -1,0 +1,36 @@
+<div class="modal-overlay" [class.visible]="isVisible" (click)="onBackdropClick()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ title }}</h3>
+      <button
+        class="modal-close"
+        (click)="onCloseClick()"
+        [disabled]="isLoading"
+        aria-label="Fermer">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-message">{{ message }}</p>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        class="btn btn-cancel"
+        (click)="onCancel()"
+        [disabled]="isLoading">
+        {{ cancelButtonText }}
+      </button>
+      <button
+        class="btn"
+        [class.btn-danger]="isDestructive"
+        [class.btn-primary]="!isDestructive"
+        (click)="onConfirm()"
+        [disabled]="isLoading">
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ confirmButtonText }}
+      </button>
+    </div>
+  </div>
+</div>

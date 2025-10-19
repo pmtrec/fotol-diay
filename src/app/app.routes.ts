@@ -60,17 +60,17 @@ export const routes: Routes = [
         path: 'mes-produits',
         loadComponent: () => import('./features/produits/pages/mes-produits/mes-produits.component').then(m => m.MesProduitsComponent)
       },
-      // {
-      //   path: 'products/edit/:id',
-      //   loadComponent: () => import('./pages/vendeur/edit-product/edit-product.component').then(m => m.EditProductComponent)
-      // },
+      {
+        path: 'products/edit/:id',
+        loadComponent: () => import('./pages/vendeur/edit-product/edit-product.component').then(m => m.EditProductComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./modules/profile/profile.component').then(m => m.ProfileComponent)
+      },
       // {
       //   path: 'orders',
       //   loadComponent: () => import('./pages/vendeur/orders/orders.component').then(m => m.OrdersComponent)
-      // },
-      // {
-      //   path: 'profile',
-      //   loadComponent: () => import('./pages/vendeur/profile/profile.component').then(m => m.ProfileComponent)
       // },
       // {
       //   path: 'analytics',
@@ -91,7 +91,7 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+        loadComponent: () => import('./pages/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
       },
       {
         path: 'users',
@@ -132,6 +132,10 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./pages/admin/admin-settings/admin-settings.component').then(m => m.AdminSettingsComponent)
+      },
+      {
+        path: 'products/edit/:id',
+        loadComponent: () => import('./pages/vendeur/edit-product/edit-product.component').then(m => m.EditProductComponent)
       },
       {
         path: 'support',

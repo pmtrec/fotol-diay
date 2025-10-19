@@ -1,626 +1,106 @@
-/* 🎨 Sidebar vendeur moderne - Design amélioré */
+/* 🎨 Sidebar vendeur moderne - Design professionnel */
 .sidebar {
-  width: 300px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8f9ff 100%);
-  border-right: 2px solid rgba(255, 119, 0, 0.1);
+  width: 260px;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
   height: 100vh;
   position: sticky;
   top: 0;
   left: 0;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   font-family: 'Poppins', sans-serif;
   z-index: 90;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, #ff7700, #ff5500);
-    transition: width 0.3s ease;
-  }
-
-  &:hover::before {
-    width: 6px;
-  }
+  transition: all 0.3s ease-in-out;
 }
 
-/* 👤 En-tête avec profil utilisateur */
 .sidebar-header {
-  padding: 2rem 1.5rem 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 119, 0, 0.05), rgba(255, 85, 0, 0.03));
-  border-bottom: 1px solid rgba(255, 119, 0, 0.1);
-  position: relative;
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
 
-  .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-
-    .profile-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ff7700, #ff5500);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid #fff;
-      box-shadow: 0 4px 15px rgba(255, 119, 0, 0.3);
-      position: relative;
-      transition: all 0.3s ease;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(135deg, #ff7700, #ff5500);
-        border-radius: 50%;
-        z-index: -1;
-        opacity: 0.3;
-        animation: avatarGlow 3s infinite ease-in-out;
-      }
-
-      i {
-        color: #fff;
-        font-size: 1.5rem;
-      }
-
-      &:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 20px rgba(255, 119, 0, 0.4);
-      }
-    }
-
-    .profile-info {
-      flex: 1;
-
-      h3 {
-        margin: 0 0 0.3rem 0;
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #333;
-        line-height: 1.2;
-      }
-
-      .profile-role {
-        font-size: 0.8rem;
-        color: #ff7700;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .profile-stats {
-        display: flex;
-        gap: 1rem;
-
-        .stat {
-          display: flex;
-          align-items: center;
-          gap: 0.3rem;
-          font-size: 0.7rem;
-          color: #666;
-
-          i {
-            color: #ff7700;
-            font-size: 0.6rem;
-          }
-        }
-      }
-    }
-  }
-}
-
-/* 🧭 Navigation principale */
-.sidebar-nav {
-  flex: 1;
-  padding: 1rem 0;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 119, 0, 0.1);
-    border-radius: 2px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ff7700, #ff5500);
-    border-radius: 2px;
-
-    &:hover {
-      background: linear-gradient(180deg, #ff5500, #ff3300);
-    }
+  h2 {
+    font-size: 1.2rem;
+    color: #ff9900;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
   }
 }
 
 .sidebar-menu {
+  flex: 1;
   list-style: none;
   margin: 0;
   padding: 0;
 
   .menu-item {
-    margin: 0.2rem 0.5rem;
-    border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.9rem 1rem;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 119, 0, 0.1), transparent);
-      transition: left 0.5s ease;
+    i {
+      font-size: 1.2rem;
+      color: #ff9900;
+      transition: all 0.3s ease;
     }
 
-    &:hover::before {
-      left: 100%;
-    }
+    &:hover {
+      background-color: #fff8ec;
+      color: #ff7700;
+      padding-left: 1.3rem;
+      box-shadow: 2px 0 8px rgba(255, 153, 0, 0.15);
 
-    &.active {
-      background: linear-gradient(135deg, #ff7700, #ff5500);
-      box-shadow: 0 4px 15px rgba(255, 119, 0, 0.3);
-
-      .menu-item-content {
-        .menu-icon {
-          transform: scale(1.1);
-          background: rgba(255, 255, 255, 0.2);
-
-          i {
-            color: #fff;
-          }
-        }
-
-        .menu-text {
-          color: #fff;
-        }
-
-        .menu-indicator {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-    }
-
-    .menu-item-content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 1.2rem;
-      cursor: pointer;
-      position: relative;
-
-      .menu-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-
-        i {
-          font-size: 1.1rem;
-          transition: all 0.3s ease;
-        }
-
-        &.featured {
-          background: linear-gradient(135deg, #22c55e, #16a34a);
-          animation: pulse 2s infinite;
-
-          i {
-            color: #fff;
-          }
-        }
-
-        &.premium {
-          background: linear-gradient(135deg, #f59e0b, #d97706);
-
-          i {
-            color: #fff;
-          }
-        }
-      }
-
-      .menu-text {
-        flex: 1;
-        font-weight: 500;
-        color: #555;
-        transition: all 0.3s ease;
-        font-size: 0.9rem;
-      }
-
-      .menu-indicator {
-        width: 3px;
-        height: 20px;
-        background: #fff;
-        border-radius: 2px;
-        opacity: 0;
-        transform: translateX(-10px);
-        transition: all 0.3s ease;
-      }
-
-      .item-count,
-      .badge-orange,
-      .badge-red {
-        background: linear-gradient(135deg, #ff7700, #ff5500);
-        color: #fff;
-        font-size: 0.7rem;
-        font-weight: 700;
-        padding: 0.2rem 0.5rem;
-        border-radius: 10px;
-        min-width: 20px;
-        text-align: center;
-        box-shadow: 0 2px 8px rgba(255, 119, 0, 0.3);
-      }
-
-      .badge-red {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-      }
-
-      .cta-badge {
-        background: linear-gradient(135deg, #22c55e, #16a34a);
-        color: #fff;
-        font-size: 0.6rem;
-        font-weight: 700;
-        padding: 0.2rem 0.5rem;
-        border-radius: 10px;
-        text-transform: uppercase;
-        animation: newBadge 2s infinite;
-      }
-
-      .premium-badge {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: #fff;
-        font-size: 0.6rem;
-        font-weight: 700;
-        padding: 0.2rem 0.5rem;
-        border-radius: 10px;
-        text-transform: uppercase;
-      }
-
-      .pulse-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #25d366, #1ebe5d);
-        animation: pulse 1.5s infinite;
-      }
-    }
-
-    &.cta-item {
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(22, 163, 74, 0.03));
-      border: 1px solid rgba(34, 197, 94, 0.2);
-
-      &:hover {
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.05));
-        border-color: rgba(34, 197, 94, 0.4);
-      }
-    }
-
-    &.premium-item {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(217, 119, 6, 0.03));
-      border: 1px solid rgba(245, 158, 11, 0.2);
-
-      &:hover {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
-        border-color: rgba(245, 158, 11, 0.4);
-      }
-    }
-
-    &:hover:not(.active) {
-      background: linear-gradient(135deg, rgba(255, 119, 0, 0.05), rgba(255, 85, 0, 0.03));
-      transform: translateX(5px);
-
-      .menu-item-content {
-        .menu-icon {
-          transform: scale(1.1);
-          background: rgba(255, 119, 0, 0.1);
-
-          i {
-            color: #ff7700;
-          }
-        }
-
-        .menu-text {
-          color: #ff7700;
-        }
-      }
-    }
-  }
-}
-
-/* 📊 Pied de sidebar avec statistiques */
-.sidebar-footer {
-  padding: 1.5rem;
-  border-top: 1px solid rgba(255, 119, 0, 0.1);
-  background: linear-gradient(135deg, rgba(255, 119, 0, 0.02), rgba(255, 85, 0, 0.01));
-
-  .quick-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-
-    .stat-item {
-      text-align: center;
-      padding: 0.8rem;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 119, 0, 0.1);
-
-      .stat-label {
-        display: block;
-        font-size: 0.7rem;
-        color: #666;
-        margin-bottom: 0.3rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .stat-value {
-        display: block;
-        font-size: 1.1rem;
-        font-weight: 700;
+      i {
+        transform: scale(1.2);
         color: #ff7700;
       }
     }
   }
+}
+
+.sidebar-footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 1rem;
+  text-align: center;
 
   .btn-contact {
-    width: 100%;
-    background: linear-gradient(135deg, #ff7700, #ff5500);
+    background: linear-gradient(135deg, #ff9900, #ff7700);
     color: white;
     border: none;
-    padding: 1rem;
-    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 119, 0, 0.3);
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 1rem;
-
-    .btn-content {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      justify-content: center;
-
-      i {
-        font-size: 1.1rem;
-      }
-
-      .btn-text {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-
-        .btn-title {
-          font-size: 0.9rem;
-          font-weight: 600;
-        }
-
-        .btn-subtitle {
-          font-size: 0.7rem;
-          opacity: 0.8;
-        }
-      }
-    }
-
-    .btn-glow {
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.5s ease;
-    }
+    box-shadow: 0 3px 8px rgba(255, 153, 0, 0.3);
 
     &:hover {
-      background: linear-gradient(135deg, #ff5500, #ff3300);
+      background: linear-gradient(135deg, #ff7700, #ff6600);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 119, 0, 0.4);
-
-      .btn-glow {
-        left: 100%;
-      }
+      box-shadow: 0 5px 12px rgba(255, 153, 0, 0.4);
     }
 
-    &:active {
-      transform: translateY(0);
-    }
-  }
-
-  .status-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      animation: statusPulse 2s infinite;
-
-      &.online {
-        background: linear-gradient(135deg, #22c55e, #16a34a);
-      }
-
-      &.offline {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-      }
-    }
-
-    .status-text {
-      font-size: 0.8rem;
-      color: #666;
-      font-weight: 500;
+    i {
+      margin-right: 6px;
     }
   }
 }
 
-/* 🎨 Animations */
-@keyframes avatarGlow {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-@keyframes newBadge {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-@keyframes statusPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* 📱 Design responsive */
-@media (max-width: 1200px) {
-  .sidebar {
-    width: 280px;
-  }
-}
-
+/* ✅ Responsive */
 @media (max-width: 992px) {
   .sidebar {
-    width: 260px;
-  }
-
-  .sidebar-header {
-    padding: 1.5rem 1rem 1rem;
-
-    .user-profile {
-      gap: 0.8rem;
-
-      .profile-avatar {
-        width: 50px;
-        height: 50px;
-
-        i {
-          font-size: 1.2rem;
-        }
-      }
-
-      .profile-info {
-        h3 {
-          font-size: 1rem;
-        }
-
-        .profile-stats {
-          gap: 0.8rem;
-
-          .stat {
-            font-size: 0.6rem;
-          }
-        }
-      }
-    }
-  }
-
-  .sidebar-menu .menu-item .menu-item-content {
-    padding: 0.8rem 1rem;
-    gap: 0.8rem;
-
-    .menu-icon {
-      width: 35px;
-      height: 35px;
-
-      i {
-        font-size: 1rem;
-      }
-    }
-
-    .menu-text {
-      font-size: 0.85rem;
-    }
+    width: 220px;
   }
 }
 
 @media (max-width: 768px) {
   .sidebar {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    height: calc(100vh - 70px);
-    z-index: 999;
-    transform: translateX(-100%);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
-
-    &.sidebar-collapsed {
-      transform: translateX(0);
-    }
-
-    &::before {
-      width: 0;
-    }
-
-    &:hover::before {
-      width: 0;
-    }
+    display: none; // tu pourras la remplacer par un menu mobile plus tard
   }
-}
-
-@media (max-width: 480px) {
-  .sidebar {
-    width: 100vw;
-
-    .sidebar-header {
-      padding: 1.5rem;
-
-      .user-profile {
-        .profile-info {
-          .profile-stats {
-            display: none;
-          }
-        }
-      }
-    }
-
-    .sidebar-menu .menu-item .menu-item-content {
-      padding: 1rem;
-
-      .menu-text {
-        font-size: 1rem;
-      }
-    }
-  }
-}
-
-/* 🎯 Focus et accessibilité */
-.menu-item:focus-within {
-  outline: 2px solid #ff7700;
-  outline-offset: 2px;
-}
-
-.btn-contact:focus {
-  outline: 2px solid #ff7700;
-  outline-offset: 2px;
 }

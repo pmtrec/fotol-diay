@@ -1,11 +1,31 @@
-.vendeur-dashboard {
-  .dashboard-header {
+.admin-dashboard {
+  .welcome-section {
     margin-bottom: 2rem;
+    text-align: center;
 
     h1 {
       margin: 0 0 0.5rem 0;
       color: #333333;
-      font-size: 2rem;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      color: #6c757d;
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  .dashboard-header {
+    margin-bottom: 2rem;
+
+    h2 {
+      margin: 0 0 0.5rem 0;
+      color: #333333;
+      font-size: 1.8rem;
       font-weight: 600;
     }
 
@@ -351,7 +371,17 @@
 
 // Responsive
 @media (max-width: 768px) {
-  .vendeur-dashboard {
+  .admin-dashboard {
+    .welcome-section {
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+
     .stats-grid {
       grid-template-columns: repeat(2, 1fr);
     }

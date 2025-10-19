@@ -1,0 +1,136 @@
+u// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Enumérations basées sur les modèles TypeScript
+enum UserRole {
+  ADMIN
+  SELLER
+  CUSTOMER
+}
+
+enum ProductStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AIValidationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ERROR
+}
+
+// Modèle Utilisateur
+model User {
+  id                  String   @id @default(cuid())
+  username            String   @unique
+  email               String   @unique
+  role                UserRole
+  firstName           String?
+  lastName            String?
+  phone               String?
+  whatsapp            String?  // Numéro WhatsApp du vendeur
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Informations spécifiques vendeur
+  businessName        String?
+  businessDescription String?
+  businessAddress     String?  // Adresse du vendeur
+  businessPhone       String?  // Téléphone professionnel
+
+  // Informations spécifiques admin
+  permissions         String[]
+
+  // Relations
+  products            Product[]
+  uploads             Upload[]
+  validations        Product[] @relation("Validator")
+
+  @@map("users")
+}
+
+// Modèle Catégorie
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  image       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  productCount Int     @default(0)
+
+  // Relations
+  products    Product[]
+
+  @@map("categories")
+}
+
+// Modèle Produit
+model Product {
+  id                    String            @id @default(cuid())
+  name                  String
+  description           String
+  price                 Float
+  images                String[]          // Jusqu'à 3 images
+  category              String
+  stock                 Int
+  rating                Float?
+  status                ProductStatus     @default(PENDING)
+  sellerId              String
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  validatedBy           String?
+  validatedAt           DateTime?
+  rejectionReason       String?
+
+  // Nouveaux champs pour la validation IA
+  aiValidationStatus    AIValidationStatus? @default(PENDING)
+  aiValidationDate      DateTime?
+  aiValidationReason    String?
+  aiValidationConfidence Float?
+  aiFlaggedCategories   String[]          @default([])
+
+  // Statistics for dashboard
+  views                 Int               @default(0)
+  contactClicks         Int               @default(0)
+  addToCartClicks       Int               @default(0)
+  whatsappClicks        Int               @default(0)
+
+  // Relations
+  seller                User              @relation(fields: [sellerId], references: [id])
+  categoryRel           Category?         @relation(fields: [category], references: [name])
+  validator             User?             @relation("Validator", fields: [validatedBy], references: [id])
+
+  @@map("products")
+}
+
+// Modèle Upload
+model Upload {
+  id          String   @id @default(cuid())
+  filename    String
+  originalName String
+  url         String
+  size        Int
+  mimeType    String
+  uploadedAt  DateTime @default(now())
+  uploadedBy  String
+
+  // Relations
+  uploader    User     @relation(fields: [uploadedBy], references: [id])
+
+  @@map("uploads")
+}

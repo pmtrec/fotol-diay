@@ -13,9 +13,16 @@ export class MockDataService {
 
   constructor(private apiService: ApiService) {}
 
+  /**
+   * Get the full URL for API endpoints
+   */
+  private getFullUrl(endpoint: string): string {
+    return `${this.baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  }
+
   // Get all users
   getUsers(): Observable<User[]> {
-    return this.apiService.get<User[]>(`${this.baseUrl}/users`).pipe(
+    return this.apiService.get<User[]>(this.getFullUrl('/users')).pipe(
       map(users => users.map(user => ({
         ...user,
         createdAt: new Date(user.createdAt),
@@ -25,8 +32,8 @@ export class MockDataService {
   }
 
   // Get user by ID
-  getUserById(id: number): Observable<User | undefined> {
-    return this.apiService.get<User>(`${this.baseUrl}/users/${id}`).pipe(
+  getUserById(id: string): Observable<User | undefined> {
+    return this.apiService.get<User>(this.getFullUrl(`/users/${id}`)).pipe(
       map(user => user ? {
         ...user,
         createdAt: new Date(user.createdAt),
@@ -44,7 +51,7 @@ export class MockDataService {
 
   // Get all categories
   getCategories(): Observable<Category[]> {
-    return this.apiService.get<Category[]>(`${this.baseUrl}/categories`).pipe(
+    return this.apiService.get<Category[]>(this.getFullUrl('/categories')).pipe(
       map(categories => categories.map(category => ({
         ...category,
         createdAt: new Date(category.createdAt),
@@ -55,7 +62,7 @@ export class MockDataService {
 
   // Get category by ID
   getCategoryById(id: number): Observable<Category | undefined> {
-    return this.apiService.get<Category>(`${this.baseUrl}/categories/${id}`).pipe(
+    return this.apiService.get<Category>(this.getFullUrl(`/categories/${id}`)).pipe(
       map(category => category ? {
         ...category,
         createdAt: new Date(category.createdAt),
@@ -66,7 +73,7 @@ export class MockDataService {
 
   // Get all products
   getProducts(): Observable<Product[]> {
-    return this.apiService.get<Product[]>(`${this.baseUrl}/products`).pipe(
+    return this.apiService.get<Product[]>(this.getFullUrl('/products')).pipe(
       map(products => products.map(product => ({
         ...product,
         createdAt: new Date(product.createdAt),
@@ -78,7 +85,7 @@ export class MockDataService {
 
   // Get product by ID
   getProductById(id: number): Observable<Product | undefined> {
-    return this.apiService.get<Product>(`${this.baseUrl}/products/${id}`).pipe(
+    return this.apiService.get<Product>(this.getFullUrl(`/products/${id}`)).pipe(
       map(product => product ? {
         ...product,
         createdAt: new Date(product.createdAt),
@@ -89,7 +96,7 @@ export class MockDataService {
   }
 
   // Get products by seller ID
-  getProductsBySeller(sellerId: number): Observable<Product[]> {
+  getProductsBySeller(sellerId: string): Observable<Product[]> {
     return this.getProducts().pipe(
       map(products => products.filter(p => p.sellerId === sellerId))
     );
@@ -125,7 +132,7 @@ export class MockDataService {
       updatedAt: new Date()
     };
 
-    return this.apiService.patch<Product>(`${this.baseUrl}/products/${productId}`, updateData);
+    return this.apiService.patch<Product>(this.getFullUrl(`/products/${productId}`), updateData);
   }
 
   // Reject product
@@ -138,7 +145,7 @@ export class MockDataService {
       updatedAt: new Date()
     };
 
-    return this.apiService.patch<Product>(`${this.baseUrl}/products/${productId}`, updateData);
+    return this.apiService.patch<Product>(this.getFullUrl(`/products/${productId}`), updateData);
   }
 
   // Add new product
@@ -149,7 +156,7 @@ export class MockDataService {
       updatedAt: new Date()
     };
 
-    return this.apiService.post<Product>(`${this.baseUrl}/products`, newProduct);
+    return this.apiService.post<Product>(this.getFullUrl('/products'), newProduct);
   }
 
   // Get dashboard stats for admin
@@ -186,7 +193,7 @@ export class MockDataService {
   }
 
   // Get dashboard stats for seller
-  getSellerDashboardStats(sellerId: number): Observable<any> {
+  getSellerDashboardStats(sellerId: string): Observable<any> {
     return this.getProductsBySeller(sellerId).pipe(
       map(products => {
         const totalProducts = products.length;

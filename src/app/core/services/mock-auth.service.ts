@@ -17,7 +17,7 @@ export class MockAuthService {
 
   private autoLogin(): void {
     // For testing purposes, automatically log in as admin
-    this.mockDataService.getUserById(1).subscribe(user => {
+    this.mockDataService.getUserById('1').subscribe(user => {
       if (user) {
         this.currentUserSubject.next(user);
         localStorage.setItem('currentUser', JSON.stringify(user));
@@ -29,25 +29,25 @@ export class MockAuthService {
     // Simple mock authentication - in real app this would call an API
     const mockCredentials: { [key: string]: { password: string; user: User } } = {
       'admin': { password: 'admin123', user: {
-        id: 1, username: 'admin', email: 'admin@klick.com', role: UserRole.ADMIN,
+        id: '1', username: 'admin', email: 'admin@klick.com', role: UserRole.ADMIN,
         firstName: 'Admin', lastName: 'Klick', isActive: true,
         createdAt: new Date('2024-01-01'), updatedAt: new Date('2024-01-01'),
         permissions: ['all']
       }},
       'vendeur1': { password: 'vendeur123', user: {
-        id: 2, username: 'vendeur1', email: 'vendeur1@klick.com', role: UserRole.SELLER,
+        id: '2', username: 'vendeur1', email: 'vendeur1@klick.com', role: UserRole.SELLER,
         firstName: 'Marie', lastName: 'Dubois', isActive: true,
         createdAt: new Date('2024-01-15'), updatedAt: new Date('2024-01-15'),
         businessName: 'Boutique Marie', businessDescription: 'Mode et accessoires féminins'
       }},
       'vendeur2': { password: 'vendeur123', user: {
-        id: 3, username: 'vendeur2', email: 'vendeur2@klick.com', role: UserRole.SELLER,
+        id: '3', username: 'vendeur2', email: 'vendeur2@klick.com', role: UserRole.SELLER,
         firstName: 'Jean', lastName: 'Martin', isActive: true,
         createdAt: new Date('2024-02-01'), updatedAt: new Date('2024-02-01'),
         businessName: 'TechStore Jean', businessDescription: 'Électronique et gadgets'
       }},
       'client1': { password: 'client123', user: {
-        id: 4, username: 'client1', email: 'client1@klick.com', role: UserRole.CUSTOMER,
+        id: '4', username: 'client1', email: 'client1@klick.com', role: UserRole.CUSTOMER,
         firstName: 'Sophie', lastName: 'Bernard', isActive: true,
         createdAt: new Date('2024-03-01'), updatedAt: new Date('2024-03-01')
       }}
@@ -84,5 +84,71 @@ export class MockAuthService {
   hasAnyRole(roles: UserRole[]): boolean {
     const user = this.currentUserSubject.value;
     return user ? roles.includes(user.role) : false;
+  }
+
+  register(userData: { username: string; email: string; password: string; role: UserRole }): Observable<User | null> {
+    // Check if username already exists
+    const existingUser = Object.keys(this.getAllMockUsers()).find(username => username === userData.username);
+    if (existingUser) {
+      return of(null); // Username already exists
+    }
+
+    // Create new user
+    const newUserId = this.getNextUserId();
+    const newUser: User = {
+      id: newUserId.toString(),
+      username: userData.username,
+      email: userData.email,
+      role: userData.role,
+      firstName: '',
+      lastName: '',
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    // Add role-specific fields
+    if (userData.role === UserRole.SELLER) {
+      newUser.businessName = `Business ${userData.username}`;
+      newUser.businessDescription = 'New seller business';
+    }
+
+    // In a real app, this would be saved to a database
+    // For now, we'll just return success
+    return of(newUser);
+  }
+
+  private getAllMockUsers(): { [key: string]: { password: string; user: User } } {
+    return {
+      'admin': { password: 'admin123', user: {
+        id: '1', username: 'admin', email: 'admin@klick.com', role: UserRole.ADMIN,
+        firstName: 'Admin', lastName: 'Klick', isActive: true,
+        createdAt: new Date('2024-01-01'), updatedAt: new Date('2024-01-01'),
+        permissions: ['all']
+      }},
+      'vendeur1': { password: 'vendeur123', user: {
+        id: '2', username: 'vendeur1', email: 'vendeur1@klick.com', role: UserRole.SELLER,
+        firstName: 'Marie', lastName: 'Dubois', isActive: true,
+        createdAt: new Date('2024-01-15'), updatedAt: new Date('2024-01-15'),
+        businessName: 'Boutique Marie', businessDescription: 'Mode et accessoires féminins'
+      }},
+      'vendeur2': { password: 'vendeur123', user: {
+        id: '3', username: 'vendeur2', email: 'vendeur2@klick.com', role: UserRole.SELLER,
+        firstName: 'Jean', lastName: 'Martin', isActive: true,
+        createdAt: new Date('2024-02-01'), updatedAt: new Date('2024-02-01'),
+        businessName: 'TechStore Jean', businessDescription: 'Électronique et gadgets'
+      }},
+      'client1': { password: 'client123', user: {
+        id: '4', username: 'client1', email: 'client1@klick.com', role: UserRole.CUSTOMER,
+        firstName: 'Sophie', lastName: 'Bernard', isActive: true,
+        createdAt: new Date('2024-03-01'), updatedAt: new Date('2024-03-01')
+      }}
+    };
+  }
+
+  private getNextUserId(): number {
+    const users = this.getAllMockUsers();
+    const maxId = Math.max(...Object.values(users).map(cred => parseInt(cred.user.id)));
+    return maxId + 1;
   }
 }

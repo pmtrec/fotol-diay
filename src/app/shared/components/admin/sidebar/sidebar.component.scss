@@ -16,7 +16,7 @@
   // En-tête de la sidebar
   .sidebar-header {
     padding: 1.5rem;
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
     color: white;
     border-bottom: none;
 
@@ -89,16 +89,16 @@ damay creer site application web moderde et responsive
           position: relative;
 
           &:hover {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
             color: white;
             transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
           }
 
           &.active {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
 
             &::before {
               content: '';
@@ -108,7 +108,7 @@ damay creer site application web moderde et responsive
               transform: translateY(-50%);
               width: 4px;
               height: 24px;
-              background: #3b82f6;
+              background: #ff9900;
               border-radius: 2px;
             }
           }
@@ -213,7 +213,7 @@ damay creer site application web moderde et responsive
       .profile-avatar {
         width: 36px;
         height: 36px;
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        background: linear-gradient(135deg, #ff9900 0%, #ff7700 100%);
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -266,7 +266,7 @@ damay creer site application web moderde et responsive
           border: 1px solid #e2e8f0;
 
           &:hover {
-            background: #3b82f6;
+            background: #ff9900;
             color: white;
             transform: translateY(-1px);
           }

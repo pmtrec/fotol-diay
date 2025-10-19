@@ -88,3 +88,16 @@
    </div>
  </div>
 </div>
+
+<!-- Confirmation Modal for Product Deletion -->
+<app-confirmation-modal
+ [isVisible]="showDeleteModal"
+ title="Confirmation de suppression"
+ message="Êtes-vous sûr de vouloir supprimer ce produit ?"
+ confirmButtonText="Supprimer"
+ cancelButtonText="Annuler"
+ [isDestructive]="true"
+ (confirmed)="confirmDeleteProduct()"
+ (cancelled)="cancelDeleteProduct()"
+ (closed)="closeDeleteModal()">
+</app-confirmation-modal>

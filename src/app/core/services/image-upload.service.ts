@@ -10,7 +10,7 @@ export interface UploadedImage {
   size: number;
   mimeType: string;
   uploadedAt: string;
-  uploadedBy?: number;
+  uploadedBy?: string;
 }
 
 @Injectable({
@@ -27,7 +27,7 @@ export class ImageUploadService {
    * @param userId L'ID de l'utilisateur qui upload (optionnel)
    * @returns Observable<string> L'URL de l'image uploadée
    */
-  uploadImage(file: File, userId?: number): Observable<string> {
+  uploadImage(file: File, userId?: string): Observable<string> {
     return new Observable((observer) => {
       // Validate file first
       if (!this.isValidImageFile(file)) {
@@ -90,7 +90,7 @@ export class ImageUploadService {
    * @param userId L'ID de l'utilisateur qui upload (optionnel)
    * @returns Observable<string[]> Les URLs des images uploadées
    */
-  uploadImages(files: File[], userId?: number): Observable<string[]> {
+  uploadImages(files: File[], userId?: string): Observable<string[]> {
     const uploadPromises = files.map(file => this.uploadImage(file, userId).toPromise());
 
     return new Observable((observer) => {
@@ -223,12 +223,12 @@ export class ImageUploadService {
   }
 
   /**
-    * Capturer une photo depuis un élément vidéo
-    * @param videoElement L'élément vidéo source
-    * @param userId L'ID de l'utilisateur qui capture (optionnel)
-    * @returns Promise<string> L'URL de l'image capturée
-    */
-  async captureFromVideoElement(videoElement: HTMLVideoElement, userId?: number): Promise<string> {
+   * Capturer une photo depuis un élément vidéo
+   * @param videoElement L'élément vidéo source
+   * @param userId L'ID de l'utilisateur qui capture (optionnel)
+   * @returns Promise<string> L'URL de l'image capturée
+   */
+  async captureFromVideoElement(videoElement: HTMLVideoElement, userId?: string): Promise<string> {
     return new Promise((resolve, reject) => {
       try {
         // Créer un canvas pour capturer l'image

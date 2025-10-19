@@ -13,5 +13,9 @@ import { ProduitsComponent } from '../../shared/components/client/produits/produ
   styleUrl: './main-layout.component.scss'
 })
 export class MainLayoutComponent {
-  
+  selectedCategories: string[] = [];
+
+  onCategorySelected(categories: string[]): void {
+    this.selectedCategories = categories;
+  }
 }

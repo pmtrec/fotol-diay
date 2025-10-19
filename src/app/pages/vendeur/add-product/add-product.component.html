@@ -255,6 +255,32 @@
       </div>
     </div>
 
+    <!-- État de la validation IA -->
+    <div class="ai-validation-section" *ngIf="isValidating || validationResult">
+      <div class="validation-status" [class.validating]="isValidating" [class.approved]="validationResult?.isAppropriate" [class.rejected]="!validationResult?.isAppropriate">
+        <div class="validation-header">
+          <i class="icon" [class]="'fa-solid ' + (isValidating ? 'fa-spinner fa-spin' : validationResult?.isAppropriate ? 'fa-check-circle' : 'fa-exclamation-triangle')"></i>
+          <h3>
+            <span *ngIf="isValidating">Validation en cours...</span>
+            <span *ngIf="!isValidating && validationResult?.isAppropriate">Contenu validé</span>
+            <span *ngIf="!isValidating && !validationResult?.isAppropriate">Contenu rejeté</span>
+          </h3>
+        </div>
+
+        <div class="validation-details" *ngIf="!isValidating && validationResult">
+          <p *ngIf="validationResult.isAppropriate">
+            Votre contenu respecte nos guidelines. Le produit sera soumis pour validation par l'administrateur.
+          </p>
+          <p *ngIf="!validationResult.isAppropriate" class="rejection-reason">
+            <strong>Raison:</strong> {{ validationResult.reason }}
+          </p>
+          <div class="validation-confidence" *ngIf="validationResult.confidence">
+            <small>Confiance: {{ (validationResult.confidence * 100) | number:'1.0-1' }}%</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Actions -->
     <div class="form-actions">
       <button type="button" class="btn btn-secondary" (click)="navigateBack()">

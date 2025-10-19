@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ConfirmationModalComponent } from '../../common/confirmation-modal/confirmation-modal.component';
 
 interface Produit {
   id: number;
@@ -23,13 +24,17 @@ interface Produit {
 @Component({
   selector: 'app-produits',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmationModalComponent],
   templateUrl: './produit.component.html',
   styleUrls: ['./produit.component.scss'],
 })
 export class ProduitsComponent implements OnInit {
   produits: Produit[] = [];
   isLoading = false;
+
+  // Modal properties
+  showDeleteModal = false;
+  productToDelete: Produit | null = null;
 
   ngOnInit() {
     this.loadProducts();
@@ -145,9 +150,26 @@ export class ProduitsComponent implements OnInit {
   }
 
   deleteProduct(product: Produit): void {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer le produit "${product.name}" ?`)) {
-      console.log('Deleting product:', product);
+    this.productToDelete = product;
+    this.showDeleteModal = true;
+  }
+
+  confirmDeleteProduct(): void {
+    if (this.productToDelete) {
+      console.log('Deleting product:', this.productToDelete);
+      // TODO: Implement actual delete logic with ProductService
+      // this.productService.deleteProduct(this.productToDelete.id).subscribe(...)
+      this.closeDeleteModal();
     }
+  }
+
+  cancelDeleteProduct(): void {
+    this.closeDeleteModal();
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.productToDelete = null;
   }
 
   validateProduct(product: Produit): void {

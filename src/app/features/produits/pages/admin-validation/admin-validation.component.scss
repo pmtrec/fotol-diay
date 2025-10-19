@@ -224,6 +224,121 @@
             &.price {
               color: #ff9900;
             }
+          
+            // Styles pour la validation IA
+            .ai-validation-info {
+              margin-top: 1rem;
+              padding: 0.75rem;
+              background: #f8f9fa;
+              border-radius: 6px;
+              border-left: 3px solid #007bff;
+          
+              .ai-status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.25rem 0.75rem;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+          
+                .status-icon {
+                  .fa-solid {
+                    font-size: 0.8rem;
+                  }
+                }
+          
+                &.ai-status-approved {
+                  background: #d1fae5;
+                  color: #065f46;
+                  border-left-color: #10b981;
+                }
+          
+                &.ai-status-rejected {
+                  background: #fee2e2;
+                  color: #991b1b;
+                  border-left-color: #ef4444;
+                }
+          
+                &.ai-status-pending {
+                  background: #fef3c7;
+                  color: #92400e;
+                  border-left-color: #f59e0b;
+                }
+          
+                &.ai-status-error {
+                  background: #f3e8ff;
+                  color: #7c3aed;
+                  border-left-color: #8b5cf6;
+                }
+          
+                &.ai-status-none {
+                  background: #f1f5f9;
+                  color: #64748b;
+                  border-left-color: #94a3b8;
+                }
+              }
+          
+              .ai-details {
+                margin-top: 0.5rem;
+          
+                .ai-reason {
+                  display: block;
+                  color: #dc2626;
+                  font-size: 0.75rem;
+                  margin-bottom: 0.25rem;
+                  font-weight: 500;
+                }
+          
+                .ai-confidence {
+                  display: block;
+                  color: #6b7280;
+                  font-size: 0.7rem;
+                }
+              }
+            }
+          
+            .product-actions {
+              .btn-approve-force {
+                flex: 1;
+                background: linear-gradient(135deg, #f59e0b, #d97706);
+                color: #fff;
+                border: none;
+                padding: 12px 16px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 0.85rem;
+                box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+          
+                &:hover {
+                  background: linear-gradient(135deg, #d97706, #b45309);
+                  transform: translateY(-2px);
+                  box-shadow: 0 5px 12px rgba(245, 158, 11, 0.4);
+                }
+              }
+          
+              .btn-edit {
+                background: linear-gradient(135deg, #6b7280, #4b5563);
+                color: #fff;
+                border: none;
+                padding: 12px 16px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 0.9rem;
+                box-shadow: 0 3px 8px rgba(107, 114, 128, 0.3);
+          
+                &:hover {
+                  background: linear-gradient(135deg, #4b5563, #374151);
+                  transform: translateY(-2px);
+                  box-shadow: 0 5px 12px rgba(107, 114, 128, 0.4);
+                }
+              }
+            }
           }
         }
       }

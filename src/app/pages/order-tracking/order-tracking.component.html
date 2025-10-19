@@ -1,0 +1,278 @@
+<div class="order-tracking">
+  <!-- Header -->
+  <div class="header">
+    <h1>Suivi de commande</h1>
+    <p class="subtitle">Suivez l'état de votre commande en temps réel</p>
+  </div>
+
+  <!-- Search Section (if no order loaded) -->
+  <div class="search-section" *ngIf="!order && !loading">
+    <div class="search-card">
+      <h3>Rechercher une commande</h3>
+      <p>Entrez votre numéro de commande pour suivre son état</p>
+
+      <div class="search-form">
+        <div class="form-group">
+          <label for="orderNumber">Numéro de commande</label>
+          <input
+            type="text"
+            id="orderNumber"
+            [(ngModel)]="orderNumber"
+            placeholder="Ex: KL123456789"
+            (keyup.enter)="searchOrderByNumber()">
+        </div>
+        <button class="btn btn-primary" (click)="searchOrderByNumber()">
+          <i class="fa-solid fa-search"></i>
+          Rechercher
+        </button>
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        <i class="fa-solid fa-exclamation-triangle"></i>
+        {{ error }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement de votre commande...</p>
+  </div>
+
+  <!-- Order Tracking Content -->
+  <div class="tracking-content" *ngIf="order && !loading">
+    <!-- Order Header -->
+    <div class="order-header">
+      <div class="order-info">
+        <h2>Commande {{ order.orderNumber }}</h2>
+        <p class="order-date">Passée le {{ formatDate(order.createdAt) }}</p>
+        <p class="order-status">
+          <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+            {{ getStatusLabel(order.status) }}
+          </span>
+        </p>
+      </div>
+
+      <div class="order-actions">
+        <button class="btn btn-outline" (click)="shareOrder()">
+          <i class="fa-solid fa-share"></i>
+          Partager
+        </button>
+        <button class="btn btn-outline" (click)="contactSupport()">
+          <i class="fa-solid fa-headset"></i>
+          Support
+        </button>
+        <button class="btn btn-primary" (click)="reorder()" *ngIf="order.status === 'delivered'">
+          <i class="fa-solid fa-redo"></i>
+          Recommander
+        </button>
+        <button class="btn btn-warning" (click)="requestCancellation()" *ngIf="canCancelOrder()">
+          <i class="fa-solid fa-times"></i>
+          Annuler
+        </button>
+      </div>
+    </div>
+
+    <!-- Tracking Timeline -->
+    <div class="tracking-timeline">
+      <div class="timeline-progress">
+        <div class="progress-bar" [style.width.%]="(getCurrentStepIndex() / (trackingSteps.length - 1)) * 100"></div>
+      </div>
+
+      <div class="timeline-steps">
+        <div
+          class="timeline-step"
+          *ngFor="let step of trackingSteps; let i = index"
+          [class.completed]="step.completed"
+          [class.current]="step.current"
+          [class.active]="i <= getCurrentStepIndex()">
+
+          <div class="step-icon">
+            <i [class]="step.icon"></i>
+          </div>
+
+          <div class="step-content">
+            <h4>{{ step.label }}</h4>
+            <p>{{ step.description }}</p>
+            <div class="step-date" *ngIf="step.completed || step.current">
+              <i class="fa-solid fa-clock"></i>
+              {{ getStepDate(step.status) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Details Grid -->
+    <div class="order-details-grid">
+      <!-- Customer Information -->
+      <div class="detail-card">
+        <h3>Informations client</h3>
+        <div class="info-list">
+          <div class="info-item">
+            <label>Nom:</label>
+            <span>{{ order.customerInfo.firstName }} {{ order.customerInfo.lastName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ order.customerInfo.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>Téléphone:</label>
+            <span>{{ order.customerInfo.phone }}</span>
+          </div>
+          <div class="info-item" *ngIf="order.customerInfo.whatsapp">
+            <label>WhatsApp:</label>
+            <span>{{ order.customerInfo.whatsapp }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping Information -->
+      <div class="detail-card">
+        <h3>Informations de livraison</h3>
+        <div class="info-list">
+          <div class="info-item">
+            <label>Adresse:</label>
+            <span>{{ order.shipping.address.street }}, {{ order.shipping.address.city }}</span>
+          </div>
+          <div class="info-item">
+            <label>Région:</label>
+            <span>{{ order.shipping.address.region }}, {{ order.shipping.address.postalCode }}</span>
+          </div>
+          <div class="info-item">
+            <label>Pays:</label>
+            <span>{{ order.shipping.address.country }}</span>
+          </div>
+          <div class="info-item">
+            <label>Méthode:</label>
+            <span>{{ order.shipping.method | titlecase }}</span>
+          </div>
+          <div class="info-item">
+            <label>Coût:</label>
+            <span>{{ formatCurrency(order.shipping.cost) }}</span>
+          </div>
+          <div class="info-item" *ngIf="order.shipping.trackingNumber">
+            <label>N° de suivi:</label>
+            <span class="tracking-number">{{ order.shipping.trackingNumber }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Information -->
+      <div class="detail-card">
+        <h3>Informations de paiement</h3>
+        <div class="info-list">
+          <div class="info-item">
+            <label>Méthode:</label>
+            <span>{{ order.payment.method | titlecase }}</span>
+          </div>
+          <div class="info-item">
+            <label>Statut:</label>
+            <span class="status-badge" [ngClass]="'status-' + order.payment.status">
+              {{ order.payment.status | titlecase }}
+            </span>
+          </div>
+          <div class="info-item">
+            <label>Montant:</label>
+            <span>{{ formatCurrency(order.payment.amount) }}</span>
+          </div>
+          <div class="info-item" *ngIf="order.payment.transactionId">
+            <label>Transaction ID:</label>
+            <span>{{ order.payment.transactionId }}</span>
+          </div>
+          <div class="info-item" *ngIf="order.payment.paidAt">
+            <label>Payé le:</label>
+            <span>{{ formatDate(order.payment.paidAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="detail-card">
+        <h3>Produits commandés</h3>
+        <div class="items-list">
+          <div class="item" *ngFor="let item of order.items">
+            <div class="item-image">
+              <img [src]="item.productImage" [alt]="item.productName">
+            </div>
+            <div class="item-info">
+              <div class="item-name">{{ item.productName }}</div>
+              <div class="item-seller">Vendeur: {{ item.sellerName }}</div>
+              <div class="item-quantity">Quantité: {{ item.quantity }}</div>
+            </div>
+            <div class="item-price">
+              {{ formatCurrency(item.totalPrice) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h3>Résumé de la commande</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span>Sous-total:</span>
+          <span>{{ formatCurrency(order.subtotal) }}</span>
+        </div>
+        <div class="summary-item">
+          <span>TVA (18%):</span>
+          <span>{{ formatCurrency(order.tax) }}</span>
+        </div>
+        <div class="summary-item">
+          <span>Livraison:</span>
+          <span>{{ formatCurrency(order.shippingCost) }}</span>
+        </div>
+        <div class="summary-item total">
+          <span>Total:</span>
+          <span>{{ formatCurrency(order.total) }}</span>
+        </div>
+      </div>
+
+      <!-- Estimated Delivery -->
+      <div class="delivery-estimate" *ngIf="order.status !== 'delivered' && order.status !== 'cancelled'">
+        <div class="estimate-info">
+          <i class="fa-solid fa-calendar-alt"></i>
+          <div>
+            <strong>Livraison estimée:</strong>
+            <span>{{ getEstimatedDeliveryDate() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actual Delivery -->
+      <div class="delivery-actual" *ngIf="order.deliveredAt">
+        <div class="delivery-info">
+          <i class="fa-solid fa-check-circle"></i>
+          <div>
+            <strong>Livrée le:</strong>
+            <span>{{ formatDate(order.deliveredAt) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="notes-section" *ngIf="order.notes">
+      <h3>Notes de commande</h3>
+      <p>{{ order.notes }}</p>
+    </div>
+
+    <!-- Cancellation Reason -->
+    <div class="cancellation-section" *ngIf="order.cancellationReason">
+      <h3>Raison de l'annulation</h3>
+      <p>{{ order.cancellationReason }}</p>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="back-section" *ngIf="order">
+    <button class="btn btn-outline" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i>
+      Retour à mes commandes
+    </button>
+  </div>
+</div>

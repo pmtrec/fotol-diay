@@ -45,10 +45,20 @@ export class AuthService {
         this.currentUserSubject.next(user);
         return user;
       } else {
-        throw new Error('Identifiants incorrects');
+        throw new Error('Nom d\'utilisateur ou mot de passe incorrect.');
       }
     } catch (error) {
-      throw error;
+      console.error('Erreur lors de la connexion:', error);
+
+      if (error instanceof Error) {
+        // Re-throw with more user-friendly message
+        if (error.message.includes('serveur') || error.message.includes('404')) {
+          throw new Error('Erreur de connexion au serveur. Veuillez réessayer plus tard.');
+        }
+        throw error;
+      } else {
+        throw new Error('Erreur inconnue lors de la connexion.');
+      }
     }
   }
 
@@ -56,6 +66,22 @@ export class AuthService {
     this.mockAuthService.logout();
     localStorage.removeItem(this.tokenKey);
     this.currentUserSubject.next(null);
+  }
+
+  async register(userData: { username: string; email: string; password: string; role: UserRole }): Promise<User> {
+    try {
+      const user = await this.mockAuthService.register(userData).toPromise();
+
+      if (user) {
+        localStorage.setItem(this.tokenKey, 'mock_token_' + user.id);
+        this.currentUserSubject.next(user);
+        return user;
+      } else {
+        throw new Error('Username already exists');
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
   private checkAuthState(): void {

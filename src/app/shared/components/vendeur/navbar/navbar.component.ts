@@ -5,6 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { PubliciteComponent } from '../bandePublicite/publicite.component';
 import { CartService } from '../../../../core/services/cart.service';
 import { Cart } from '../../../../core/models/cart.model';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -30,7 +31,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private cartService: CartService, private router: Router) {}
+  constructor(private cartService: CartService, private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
     // Abonnement au panier
@@ -98,10 +99,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    // Ici tu peux ajouter ton service d'authentification pour logout
-    console.log('Déconnexion...');
+    this.authService.logout();
     this.showProfileDropdown = false;
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
   }
 
   goToWhatsApp(): void {

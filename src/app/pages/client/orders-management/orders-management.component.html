@@ -1,0 +1,579 @@
+<div class="orders-management">
+  <div class="header">
+    <h1>Mes Commandes</h1>
+    <p class="subtitle">Suivez l'état de vos commandes et historique d'achat</p>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fa-solid fa-shopping-bag"></i>
+      </div>
+      <div class="stat-info">
+        <h3>{{ customerStats.total }}</h3>
+        <p>Total Commandes</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon pending">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <div class="stat-info">
+        <h3>{{ getActiveOrdersCount() }}</h3>
+        <p>En Cours</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon delivered">
+        <i class="fa-solid fa-check-circle"></i>
+      </div>
+      <div class="stat-info">
+        <h3>{{ customerStats.delivered }}</h3>
+        <p>Livrées</p>
+      </div>
+    </div>
+
+    <div class="stat-card revenue">
+      <div class="stat-icon">
+        <i class="fa-solid fa-money-bill-wave"></i>
+      </div>
+      <div class="stat-info">
+        <h3>{{ formatCurrency(customerStats.totalSpent) }}</h3>
+        <p>Total Dépensé</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions" *ngIf="getActiveOrdersCount() > 0">
+    <div class="action-card">
+      <i class="fa-solid fa-truck"></i>
+      <div class="action-info">
+        <h4>{{ getActiveOrdersCount() }} commande(s) en cours</h4>
+        <p>Suivez l'état de vos commandes en cours de traitement</p>
+        <button class="btn btn-primary" (click)="statusFilter = 'paid'; onStatusFilterChange()">
+          Voir les commandes en cours
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Orders -->
+  <div class="recent-orders" *ngIf="getRecentOrders().length > 0">
+    <h3>Commandes Récentes</h3>
+    <div class="recent-grid">
+      <div class="recent-card" *ngFor="let order of getRecentOrders()">
+        <div class="recent-header">
+          <span class="order-number">{{ order.orderNumber }}</span>
+          <span class="order-date">{{ formatDate(order.deliveredAt || order.createdAt) }}</span>
+        </div>
+        <div class="recent-body">
+          <div class="products-count">{{ order.items.length }} produit(s)</div>
+          <div class="order-total">{{ formatCurrency(order.total) }}</div>
+        </div>
+        <div class="recent-actions">
+          <button class="btn btn-outline btn-sm" (click)="viewOrder(order)">
+            Voir détails
+          </button>
+          <button class="btn btn-primary btn-sm" (click)="reorder(order)">
+            Recommander
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fa-solid fa-search"></i>
+      <input
+        type="text"
+        placeholder="Rechercher par numéro de commande ou produit..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()">
+    </div>
+
+    <div class="filters-row">
+      <div class="filter-group">
+        <label>Statut:</label>
+        <select [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+          <option value="all">Tous les statuts</option>
+          <option value="pending">En attente</option>
+          <option value="paid">Payée</option>
+          <option value="processing">En traitement</option>
+          <option value="shipped">Expédiée</option>
+          <option value="delivered">Livrée</option>
+          <option value="cancelled">Annulée</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Date début:</label>
+        <input
+          type="date"
+          [(ngModel)]="dateFrom"
+          (change)="onDateFilterChange()">
+      </div>
+
+      <div class="filter-group">
+        <label>Date fin:</label>
+        <input
+          type="date"
+          [(ngModel)]="dateTo"
+          (change)="onDateFilterChange()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-container" *ngIf="!loading; else loadingTemplate">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th (click)="onSortChange('orderNumber')" class="sortable">
+            <i [class]="getSortIcon('orderNumber')"></i>
+            Commande
+          </th>
+          <th>Produits</th>
+          <th (click)="onSortChange('total')" class="sortable">
+            <i [class]="getSortIcon('total')"></i>
+            Montant
+          </th>
+          <th (click)="onSortChange('status')" class="sortable">
+            <i [class]="getSortIcon('status')"></i>
+            Statut
+          </th>
+          <th (click)="onSortChange('createdAt')" class="sortable">
+            <i [class]="getSortIcon('createdAt')"></i>
+            Date
+          </th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of filteredOrders" class="order-row">
+          <td>
+            <div class="order-number">
+              <strong>{{ order.orderNumber }}</strong>
+              <span class="items-count">({{ order.items.length }} produits)</span>
+            </div>
+          </td>
+          <td>
+            <div class="products-preview">
+              <div class="product-item" *ngFor="let item of order.items.slice(0, 2)">
+                <img [src]="item.productImage" [alt]="item.productName" [title]="item.productName">
+                <span *ngIf="order.items.length > 2" class="more-items">+{{ order.items.length - 2 }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="amount">
+              <strong>{{ formatCurrency(order.total) }}</strong>
+              <div class="payment-status">
+                {{ order.payment.status | titlecase }}
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="date">
+              {{ formatDate(order.createdAt) }}
+            </div>
+          </td>
+          <td>
+            <div class="actions">
+              <button
+                class="btn btn-primary btn-sm"
+                (click)="viewOrder(order)"
+                title="Voir détails">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+
+              <button
+                *ngIf="order.status === 'shipped'"
+                class="btn btn-info btn-sm"
+                (click)="viewTracking(order)"
+                title="Suivi de livraison">
+                <i class="fa-solid fa-map-marker-alt"></i>
+              </button>
+
+              <button
+                *ngIf="canReorder(order)"
+                class="btn btn-success btn-sm"
+                (click)="reorder(order)"
+                title="Recommander">
+                <i class="fa-solid fa-redo"></i>
+              </button>
+
+              <button
+                *ngIf="canCancelOrder(order)"
+                class="btn btn-warning btn-sm"
+                (click)="requestCancellation(order)"
+                title="Demander annulation">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredOrders.length === 0">
+      <i class="fa-solid fa-shopping-bag"></i>
+      <h3 *ngIf="customerStats.total === 0">Vous n'avez pas encore passé de commandes</h3>
+      <h3 *ngIf="customerStats.total > 0">Aucune commande trouvée</h3>
+      <p *ngIf="customerStats.total === 0">Découvrez nos produits et passez votre première commande !</p>
+      <p *ngIf="customerStats.total > 0">Il n'y a aucune commande correspondant à vos critères de recherche.</p>
+    </div>
+  </div>
+
+  <!-- Loading Template -->
+  <ng-template #loadingTemplate>
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement de vos commandes...</p>
+    </div>
+  </ng-template>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="filteredOrders.length > 0">
+    <div class="pagination-info">
+      <span>Affichage de {{ ((currentPage - 1) * itemsPerPage) + 1 }} à {{ getCurrentPageEnd() }} sur {{ totalItems }} commandes</span>
+    </div>
+    <div class="pagination-controls">
+      <button
+        class="btn btn-outline"
+        [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)">
+        <i class="fa-solid fa-chevron-left"></i>
+        Précédent
+      </button>
+
+      <div class="page-numbers">
+        <button
+          *ngFor="let page of getPaginationArray()"
+          class="btn"
+          [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
+          {{ page }}
+        </button>
+      </div>
+
+      <button
+        class="btn btn-outline"
+        [disabled]="currentPage === getPaginationArray().length"
+        (click)="onPageChange(currentPage + 1)">
+        Suivant
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal-overlay" *ngIf="showOrderModal" (click)="closeOrderModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Détails de la commande {{ selectedOrder?.orderNumber }}</h2>
+      <button class="btn btn-close" (click)="closeOrderModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedOrder">
+      <div class="order-details-grid">
+        <!-- Order Items -->
+        <div class="detail-section">
+          <h3>Produits Commandés</h3>
+          <div class="items-list">
+            <div class="item" *ngFor="let item of selectedOrder.items">
+              <div class="item-image">
+                <img [src]="item.productImage" [alt]="item.productName" />
+              </div>
+              <div class="item-info">
+                <div class="item-name">{{ item.productName }}</div>
+                <div class="item-seller">Vendeur: {{ item.sellerName }}</div>
+                <div class="item-quantity">Quantité: {{ item.quantity }}</div>
+                <div class="item-price">{{ formatCurrency(item.unitPrice) }} × {{ item.quantity }}</div>
+              </div>
+              <div class="item-total">
+                {{ formatCurrency(item.totalPrice) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Status & Tracking -->
+        <div class="detail-section">
+          <h3>Statut de la Commande</h3>
+          <div class="status-timeline">
+            <div class="timeline-item" [class.active]="getCurrentTrackingStep(selectedOrder) >= 0" [class.current]="getCurrentTrackingStep(selectedOrder) === 0">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-shopping-cart"></i>
+              </div>
+              <div class="timeline-content">
+                <h4>Commande reçue</h4>
+                <p>{{ formatDate(selectedOrder.createdAt) }}</p>
+              </div>
+            </div>
+
+            <div class="timeline-item" [class.active]="getCurrentTrackingStep(selectedOrder) >= 1" [class.current]="getCurrentTrackingStep(selectedOrder) === 1">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-credit-card"></i>
+              </div>
+              <div class="timeline-content">
+                <h4>Paiement confirmé</h4>
+                <p *ngIf="selectedOrder.payment.paidAt">{{ formatDate(selectedOrder.payment.paidAt) }}</p>
+                <p *ngIf="!selectedOrder.payment.paidAt">En attente</p>
+              </div>
+            </div>
+
+            <div class="timeline-item" [class.active]="getCurrentTrackingStep(selectedOrder) >= 2" [class.current]="getCurrentTrackingStep(selectedOrder) === 2">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-cog"></i>
+              </div>
+              <div class="timeline-content">
+                <h4>En préparation</h4>
+                <p *ngIf="selectedOrder.status === 'processing' || selectedOrder.status === 'shipped' || selectedOrder.status === 'delivered'">En cours</p>
+                <p *ngIf="selectedOrder.status === 'paid'">En attente</p>
+              </div>
+            </div>
+
+            <div class="timeline-item" [class.active]="getCurrentTrackingStep(selectedOrder) >= 3" [class.current]="getCurrentTrackingStep(selectedOrder) === 3">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-truck"></i>
+              </div>
+              <div class="timeline-content">
+                <h4>Expédiée</h4>
+                <p *ngIf="selectedOrder.shippedAt">{{ formatDate(selectedOrder.shippedAt) }}</p>
+                <p *ngIf="!selectedOrder.shippedAt && selectedOrder.status !== 'shipped'">En attente</p>
+                <p *ngIf="selectedOrder.shipping.trackingNumber">N° suivi: {{ selectedOrder.shipping.trackingNumber }}</p>
+              </div>
+            </div>
+
+            <div class="timeline-item" [class.active]="getCurrentTrackingStep(selectedOrder) >= 4" [class.current]="getCurrentTrackingStep(selectedOrder) === 4">
+              <div class="timeline-icon">
+                <i class="fa-solid fa-check-circle"></i>
+              </div>
+              <div class="timeline-content">
+                <h4>Livrée</h4>
+                <p *ngIf="selectedOrder.deliveredAt">{{ formatDate(selectedOrder.deliveredAt) }}</p>
+                <p *ngIf="!selectedOrder.deliveredAt">En attente</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="detail-section">
+          <h3>Informations de Paiement</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Méthode:</label>
+              <span>{{ selectedOrder.payment.method | titlecase }}</span>
+            </div>
+            <div class="info-item">
+              <label>Statut:</label>
+              <span class="status-badge" [ngClass]="'status-' + selectedOrder.payment.status">
+                {{ selectedOrder.payment.status | titlecase }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Montant:</label>
+              <span>{{ formatCurrency(selectedOrder.payment.amount) }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedOrder.payment.transactionId">
+              <label>Transaction ID:</label>
+              <span>{{ selectedOrder.payment.transactionId }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Information -->
+        <div class="detail-section">
+          <h3>Informations de Livraison</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Adresse:</label>
+              <span>{{ selectedOrder.shipping.address.street }}, {{ selectedOrder.shipping.address.city }}</span>
+            </div>
+            <div class="info-item">
+              <label>Région:</label>
+              <span>{{ selectedOrder.shipping.address.region }}, {{ selectedOrder.shipping.address.postalCode }}</span>
+            </div>
+            <div class="info-item">
+              <label>Méthode:</label>
+              <span>{{ selectedOrder.shipping.method | titlecase }}</span>
+            </div>
+            <div class="info-item">
+              <label>Coût de livraison:</label>
+              <span>{{ formatCurrency(selectedOrder.shipping.cost) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h3>Résumé de la commande</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span>Sous-total:</span>
+            <span>{{ formatCurrency(selectedOrder.subtotal) }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Taxe:</span>
+            <span>{{ formatCurrency(selectedOrder.tax) }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Livraison:</span>
+            <span>{{ formatCurrency(selectedOrder.shippingCost) }}</span>
+          </div>
+          <div class="summary-item total">
+            <span>Total:</span>
+            <span>{{ formatCurrency(selectedOrder.total) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="notes-section" *ngIf="selectedOrder.notes">
+        <h3>Notes de commande</h3>
+        <p>{{ selectedOrder.notes }}</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="status-actions">
+        <button
+          *ngIf="selectedOrder?.status === 'shipped'"
+          class="btn btn-info"
+          (click)="viewTracking(selectedOrder!)">
+          <i class="fa-solid fa-map-marker-alt"></i>
+          Suivi de livraison
+        </button>
+
+        <button
+          *ngIf="canReorder(selectedOrder!)"
+          class="btn btn-success"
+          (click)="reorder(selectedOrder!)">
+          <i class="fa-solid fa-redo"></i>
+          Recommander
+        </button>
+
+        <button
+          *ngIf="canCancelOrder(selectedOrder!)"
+          class="btn btn-warning"
+          (click)="requestCancellation(selectedOrder!)">
+          <i class="fa-solid fa-times"></i>
+          Demander l'annulation
+        </button>
+      </div>
+
+      <button class="btn btn-outline" (click)="closeOrderModal()">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Tracking Modal -->
+<div class="modal-overlay" *ngIf="showTrackingModal" (click)="closeTrackingModal()">
+  <div class="modal-container tracking-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Suivi de livraison - {{ selectedOrder?.orderNumber }}</h2>
+      <button class="btn btn-close" (click)="closeTrackingModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedOrder">
+      <div class="tracking-info">
+        <div class="tracking-header">
+          <h3>Informations de livraison</h3>
+          <div class="tracking-number" *ngIf="selectedOrder.shipping.trackingNumber">
+            <strong>N° de suivi:</strong> {{ selectedOrder.shipping.trackingNumber }}
+          </div>
+        </div>
+
+        <div class="tracking-timeline">
+          <div class="timeline-item" [class.completed]="selectedOrder.status !== 'pending' && selectedOrder.status !== 'paid'">
+            <div class="timeline-icon">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Commande confirmée</h4>
+              <p>{{ formatDate(selectedOrder.createdAt) }}</p>
+            </div>
+          </div>
+
+          <div class="timeline-item" [class.completed]="selectedOrder.payment.status === 'completed'">
+            <div class="timeline-icon">
+              <i class="fa-solid fa-credit-card"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Paiement validé</h4>
+              <p *ngIf="selectedOrder.payment.paidAt">{{ formatDate(selectedOrder.payment.paidAt) }}</p>
+              <p *ngIf="!selectedOrder.payment.paidAt">En attente</p>
+            </div>
+          </div>
+
+          <div class="timeline-item" [class.completed]="selectedOrder.status === 'processing' || selectedOrder.status === 'shipped' || selectedOrder.status === 'delivered'">
+            <div class="timeline-icon">
+              <i class="fa-solid fa-box"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Colis préparé</h4>
+              <p *ngIf="selectedOrder.status === 'processing' || selectedOrder.status === 'shipped' || selectedOrder.status === 'delivered'">Terminé</p>
+              <p *ngIf="selectedOrder.status === 'paid'">En cours</p>
+            </div>
+          </div>
+
+          <div class="timeline-item" [class.completed]="selectedOrder.status === 'shipped' || selectedOrder.status === 'delivered'">
+            <div class="timeline-icon">
+              <i class="fa-solid fa-truck"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Expédié</h4>
+              <p *ngIf="selectedOrder.shippedAt">{{ formatDate(selectedOrder.shippedAt) }}</p>
+              <p *ngIf="!selectedOrder.shippedAt && selectedOrder.status !== 'shipped'">En attente</p>
+            </div>
+          </div>
+
+          <div class="timeline-item" [class.completed]="selectedOrder.status === 'delivered'">
+            <div class="timeline-icon">
+              <i class="fa-solid fa-home"></i>
+            </div>
+            <div class="timeline-content">
+              <h4>Livré</h4>
+              <p *ngIf="selectedOrder.deliveredAt">{{ formatDate(selectedOrder.deliveredAt) }}</p>
+              <p *ngIf="!selectedOrder.deliveredAt">En attente</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="delivery-address">
+          <h4>Adresse de livraison</h4>
+          <p>{{ selectedOrder.shipping.address.street }}</p>
+          <p>{{ selectedOrder.shipping.address.city }}, {{ selectedOrder.shipping.address.region }} {{ selectedOrder.shipping.address.postalCode }}</p>
+          <p>{{ selectedOrder.shipping.address.country }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeTrackingModal()">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>

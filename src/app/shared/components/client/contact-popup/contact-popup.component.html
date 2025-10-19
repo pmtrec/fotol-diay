@@ -1,0 +1,61 @@
+<div class="contact-popup-overlay" *ngIf="isVisible" (click)="closePopup()">
+  <div class="contact-popup" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <h3>Contacter le vendeur</h3>
+      <button class="close-btn" (click)="closePopup()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <div class="popup-body">
+      <div class="seller-info" *ngIf="seller">
+        <div class="seller-avatar">
+          <i class="fa-solid fa-store"></i>
+        </div>
+        <div class="seller-details">
+          <h4>{{ sellerDisplayName }}</h4>
+          <p *ngIf="product">À propos de: <strong>{{ product.name }}</strong></p>
+        </div>
+      </div>
+
+      <div class="contact-options">
+        <button
+          *ngIf="hasWhatsApp"
+          class="contact-option whatsapp"
+          (click)="contactViaWhatsApp()">
+          <div class="option-icon">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <div class="option-details">
+            <span class="option-title">WhatsApp</span>
+            <span class="option-subtitle">Discuter avec le vendeur</span>
+          </div>
+          <div class="option-arrow">
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </button>
+
+        <button
+          *ngIf="hasPhone"
+          class="contact-option phone"
+          (click)="contactViaPhone()">
+          <div class="option-icon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div class="option-details">
+            <span class="option-title">Téléphone</span>
+            <span class="option-subtitle">Appeler le vendeur</span>
+          </div>
+          <div class="option-arrow">
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </button>
+
+        <div *ngIf="!hasWhatsApp && !hasPhone" class="no-contact">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <p>Aucun moyen de contact disponible pour ce vendeur.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

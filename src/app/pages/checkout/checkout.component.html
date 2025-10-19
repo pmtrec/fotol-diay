@@ -1,0 +1,411 @@
+<div class="checkout">
+  <div class="header">
+    <h1>Finaliser la commande</h1>
+    <p class="subtitle">Complétez vos informations pour finaliser votre achat</p>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="progress-steps">
+    <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+      <div class="step-number">1</div>
+      <div class="step-label">Informations</div>
+    </div>
+    <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+      <div class="step-number">2</div>
+      <div class="step-label">Livraison</div>
+    </div>
+    <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
+      <div class="step-number">3</div>
+      <div class="step-label">Paiement</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Customer Information -->
+  <div class="step-content" *ngIf="currentStep === 1">
+    <div class="step-header">
+      <h2>Informations personnelles</h2>
+      <p>Vos informations de contact</p>
+    </div>
+
+    <form [formGroup]="customerForm" class="customer-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">Prénom *</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            [class.invalid]="customerForm.get('firstName')?.invalid && customerForm.get('firstName')?.touched"
+            placeholder="Votre prénom">
+          <div class="error" *ngIf="customerForm.get('firstName')?.invalid && customerForm.get('firstName')?.touched">
+            Prénom requis (minimum 2 caractères)
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Nom *</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            [class.invalid]="customerForm.get('lastName')?.invalid && customerForm.get('lastName')?.touched"
+            placeholder="Votre nom">
+          <div class="error" *ngIf="customerForm.get('lastName')?.invalid && customerForm.get('lastName')?.touched">
+            Nom requis (minimum 2 caractères)
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            [class.invalid]="customerForm.get('email')?.invalid && customerForm.get('email')?.touched"
+            placeholder="votre.email@example.com">
+          <div class="error" *ngIf="customerForm.get('email')?.invalid && customerForm.get('email')?.touched">
+            Email valide requis
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Téléphone *</label>
+          <input
+            type="tel"
+            id="phone"
+            formControlName="phone"
+            [class.invalid]="customerForm.get('phone')?.invalid && customerForm.get('phone')?.touched"
+            placeholder="+221 XX XXX XX XX">
+          <div class="error" *ngIf="customerForm.get('phone')?.invalid && customerForm.get('phone')?.touched">
+            Numéro de téléphone valide requis
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="whatsapp">WhatsApp (optionnel)</label>
+        <input
+          type="tel"
+          id="whatsapp"
+          formControlName="whatsapp"
+          placeholder="+221 XX XXX XX XX">
+      </div>
+    </form>
+  </div>
+
+  <!-- Step 2: Shipping Information -->
+  <div class="step-content" *ngIf="currentStep === 2">
+    <div class="step-header">
+      <h2>Informations de livraison</h2>
+      <p>Où souhaitez-vous recevoir votre commande ?</p>
+    </div>
+
+    <form [formGroup]="shippingForm" class="shipping-form">
+      <div class="form-section">
+        <h3>Adresse de livraison</h3>
+        <div class="form-group">
+          <label for="street">Adresse *</label>
+          <input
+            type="text"
+            id="street"
+            formControlName="address.street"
+            [class.invalid]="shippingForm.get('address.street')?.invalid && shippingForm.get('address.street')?.touched"
+            placeholder="123 Rue de la République">
+          <div class="error" *ngIf="shippingForm.get('address.street')?.invalid && shippingForm.get('address.street')?.touched">
+            Adresse requise
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">Ville *</label>
+            <input
+              type="text"
+              id="city"
+              formControlName="address.city"
+              [class.invalid]="shippingForm.get('address.city')?.invalid && shippingForm.get('address.city')?.touched"
+              placeholder="Dakar">
+          </div>
+
+          <div class="form-group">
+            <label for="region">Région *</label>
+            <select
+              id="region"
+              formControlName="address.region"
+              [class.invalid]="shippingForm.get('address.region')?.invalid && shippingForm.get('address.region')?.touched">
+              <option value="">Sélectionnez une région</option>
+              <option value="Dakar">Dakar</option>
+              <option value="Thiès">Thiès</option>
+              <option value="Saint-Louis">Saint-Louis</option>
+              <option value="Louga">Louga</option>
+              <option value="Matam">Matam</option>
+              <option value="Ziguinchor">Ziguinchor</option>
+              <option value="Kolda">Kolda</option>
+              <option value="Sédhiou">Sédhiou</option>
+              <option value="Kaffrine">Kaffrine</option>
+              <option value="Kédougou">Kédougou</option>
+              <option value="Tambacounda">Tambacounda</option>
+              <option value="Diourbel">Diourbel</option>
+              <option value="Fatick">Fatick</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="postalCode">Code postal *</label>
+            <input
+              type="text"
+              id="postalCode"
+              formControlName="address.postalCode"
+              [class.invalid]="shippingForm.get('address.postalCode')?.invalid && shippingForm.get('address.postalCode')?.touched"
+              placeholder="10000">
+          </div>
+
+          <div class="form-group">
+            <label for="country">Pays *</label>
+            <input
+              type="text"
+              id="country"
+              formControlName="address.country"
+              [class.invalid]="shippingForm.get('address.country')?.invalid && shippingForm.get('address.country')?.touched"
+              value="Senegal"
+              readonly>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Mode de livraison</h3>
+        <div class="shipping-methods">
+          <div
+            class="shipping-method"
+            *ngFor="let method of shippingMethods"
+            [class.selected]="shippingForm.get('method')?.value === method.value"
+            (click)="shippingForm.patchValue({ method: method.value })">
+            <div class="method-info">
+              <div class="method-name">{{ method.label }}</div>
+              <div class="method-details">{{ method.estimated }}</div>
+            </div>
+            <div class="method-cost">{{ formatCurrency(method.cost) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Notes de livraison (optionnel)</label>
+        <textarea
+          id="notes"
+          formControlName="notes"
+          rows="3"
+          placeholder="Instructions spéciales, préférences de livraison..."></textarea>
+      </div>
+    </form>
+  </div>
+
+  <!-- Step 3: Payment Information -->
+  <div class="step-content" *ngIf="currentStep === 3">
+    <div class="step-header">
+      <h2>Informations de paiement</h2>
+      <p>Choisissez votre mode de paiement</p>
+    </div>
+
+    <form [formGroup]="paymentForm" class="payment-form">
+      <div class="form-section">
+        <h3>Mode de paiement</h3>
+        <div class="payment-methods">
+          <div
+            class="payment-method"
+            *ngFor="let method of paymentMethods"
+            [class.selected]="paymentForm.get('method')?.value === method.value"
+            (click)="paymentForm.patchValue({ method: method.value })">
+            <div class="method-icon">
+              <i [class]="method.icon"></i>
+            </div>
+            <div class="method-info">
+              <div class="method-name">{{ method.label }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card payment form -->
+      <div class="card-form" *ngIf="paymentForm.get('method')?.value === 'card'">
+        <h3>Informations carte bancaire</h3>
+        <div class="form-group">
+          <label for="cardNumber">Numéro de carte *</label>
+          <input
+            type="text"
+            id="cardNumber"
+            formControlName="cardNumber"
+            [class.invalid]="paymentForm.get('cardNumber')?.invalid && paymentForm.get('cardNumber')?.touched"
+            placeholder="1234 5678 9012 3456">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="expiryDate">Date d'expiration *</label>
+            <input
+              type="text"
+              id="expiryDate"
+              formControlName="expiryDate"
+              [class.invalid]="paymentForm.get('expiryDate')?.invalid && paymentForm.get('expiryDate')?.touched"
+              placeholder="MM/YY">
+          </div>
+
+          <div class="form-group">
+            <label for="cvv">CVV *</label>
+            <input
+              type="text"
+              id="cvv"
+              formControlName="cvv"
+              [class.invalid]="paymentForm.get('cvv')?.invalid && paymentForm.get('cvv')?.touched"
+              placeholder="123">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cardHolderName">Nom du titulaire *</label>
+          <input
+            type="text"
+            id="cardHolderName"
+            formControlName="cardHolderName"
+            [class.invalid]="paymentForm.get('cardHolderName')?.invalid && paymentForm.get('cardHolderName')?.touched"
+            placeholder="Nom complet">
+        </div>
+      </div>
+
+      <!-- PayPal info -->
+      <div class="payment-info" *ngIf="paymentForm.get('method')?.value === 'paypal'">
+        <div class="info-box">
+          <i class="fa-solid fa-info-circle"></i>
+          <p>Vous serez redirigé vers PayPal pour finaliser le paiement en toute sécurité.</p>
+        </div>
+      </div>
+
+      <!-- Mobile Money info -->
+      <div class="payment-info" *ngIf="paymentForm.get('method')?.value === 'mobile_money'">
+        <div class="info-box">
+          <i class="fa-solid fa-mobile-alt"></i>
+          <p>Vous recevrez un code de confirmation par SMS pour valider le paiement.</p>
+        </div>
+      </div>
+
+      <!-- Bank transfer info -->
+      <div class="payment-info" *ngIf="paymentForm.get('method')?.value === 'bank_transfer'">
+        <div class="info-box">
+          <i class="fa-solid fa-university"></i>
+          <p>Les informations bancaires vous seront envoyées par email après confirmation de la commande.</p>
+        </div>
+      </div>
+
+      <!-- Cash on delivery info -->
+      <div class="payment-info" *ngIf="paymentForm.get('method')?.value === 'cash_on_delivery'">
+        <div class="info-box">
+          <i class="fa-solid fa-truck"></i>
+          <p>Vous paierez directement au livreur lors de la réception de votre commande.</p>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Order Summary Sidebar -->
+  <div class="order-summary">
+    <h3>Résumé de la commande</h3>
+
+    <!-- Cart Items -->
+    <div class="cart-items">
+      <div class="cart-item" *ngFor="let item of cartItems">
+        <div class="item-image">
+          <img [src]="item.product.images[0]" [alt]="item.product.name">
+        </div>
+        <div class="item-info">
+          <div class="item-name">{{ item.product.name }}</div>
+          <div class="item-seller">Vendeur: {{ item.product.sellerId }}</div>
+          <div class="item-quantity">Quantité: {{ item.quantity }}</div>
+        </div>
+        <div class="item-price">
+          {{ formatCurrency(item.product.price * item.quantity) }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="totals">
+      <div class="total-item">
+        <span>Sous-total:</span>
+        <span>{{ formatCurrency(subtotal) }}</span>
+      </div>
+      <div class="total-item">
+        <span>TVA (18%):</span>
+        <span>{{ formatCurrency(tax) }}</span>
+      </div>
+      <div class="total-item">
+        <span>Livraison:</span>
+        <span>{{ formatCurrency(shippingCost) }}</span>
+      </div>
+      <div class="total-item grand-total">
+        <span>Total:</span>
+        <span>{{ formatCurrency(total) }}</span>
+      </div>
+    </div>
+
+    <!-- Delivery info -->
+    <div class="delivery-info" *ngIf="getSelectedShippingMethod()">
+      <div class="delivery-method">
+        <i class="fa-solid fa-truck"></i>
+        <span>{{ getSelectedShippingMethod().label }}</span>
+      </div>
+      <div class="delivery-time">
+        <i class="fa-solid fa-clock"></i>
+        <span>Livraison estimée: {{ getSelectedShippingMethod().estimated }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="step-navigation">
+    <button
+      class="btn btn-outline"
+      *ngIf="currentStep > 1"
+      (click)="previousStep()"
+      [disabled]="submitting">
+      <i class="fa-solid fa-arrow-left"></i>
+      Précédent
+    </button>
+
+    <button
+      class="btn btn-primary"
+      *ngIf="currentStep < totalSteps"
+      (click)="nextStep()"
+      [disabled]="!canProceedToNextStep() || submitting">
+      Suivant
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+
+    <button
+      class="btn btn-success"
+      *ngIf="currentStep === totalSteps"
+      (click)="onSubmit()"
+      [disabled]="!canProceedToNextStep() || submitting">
+      <span *ngIf="!submitting">
+        <i class="fa-solid fa-check"></i>
+        Finaliser la commande
+      </span>
+      <span *ngIf="submitting">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Traitement en cours...
+      </span>
+    </button>
+  </div>
+
+  <!-- Back to Cart -->
+  <div class="back-to-cart">
+    <button class="btn btn-link" (click)="goToCart()">
+      <i class="fa-solid fa-arrow-left"></i>
+      Retour au panier
+    </button>
+  </div>
+</div>

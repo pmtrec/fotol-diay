@@ -5,12 +5,20 @@
     "ng": "ng",
     "start": "ng serve",
     "start:dev": "concurrently \"npm run json-server\" \"ng serve --port 4201\"",
-    "start:prod": "npm run build && npm run json-server",
+    "start:prod": "npm run build:prod && npm run serve:prod",
     "json-server": "json-server --watch db.json --port 3002",
     "json-server:bg": "json-server --watch db.json --port 3002 --host 0.0.0.0",
-    "build": "ng build",
+    "build": "ng build --configuration production",
+    "build:prod": "ng build --configuration production",
+    "build:dev": "ng build --configuration development",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "serve:prod": "npx http-server dist/frontend -p 4200 -c-1",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:deploy": "tsx scripts/deploy-db.ts",
+    "db:studio": "prisma studio"
   },
   "prettier": {
     "printWidth": 100,
@@ -33,10 +41,13 @@
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
     "@fortawesome/fontawesome-free": "^7.1.0",
+    "@prisma/client": "^6.17.1",
+    "@supabase/supabase-js": "^2.75.1",
     "chart.js": "^4.5.1",
     "cloudinary": "^1.41.3",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
+    "prisma": "^6.17.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -47,6 +58,7 @@
     "@angular/compiler-cli": "^20.3.0",
     "@types/jasmine": "~5.1.0",
     "concurrently": "^9.2.1",
+    "dotenv": "^17.2.3",
     "jasmine-core": "~5.9.0",
     "json-server": "^1.0.0-beta.3",
     "karma": "~6.4.0",
@@ -54,6 +66,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "tsx": "^4.20.6",
     "typescript": "~5.9.2"
   }
 }

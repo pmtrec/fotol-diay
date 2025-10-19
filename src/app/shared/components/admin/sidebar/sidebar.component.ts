@@ -4,6 +4,7 @@ import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ProductService } from '../../../../core/services/product.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 interface MenuItem {
   label: string;
@@ -87,7 +88,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(private router: Router, private productService: ProductService) {
+  constructor(private router: Router, private productService: ProductService, private authService: AuthService) {
     this.router.events
       .pipe(
         takeUntil(this.destroy$),
@@ -137,5 +138,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (item.badge > 20) return 'badge-high';
     if (item.badge > 5) return 'badge-medium';
     return 'badge-low';
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 }
